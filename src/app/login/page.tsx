@@ -75,7 +75,7 @@ const AuthPage = () => {
           </TabButton>
         </div>
 
-        <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+        <form onSubmit={handleSubmit} className="flex flex-col gap-4 text-light">
           <Input
             type="text"
             placeholder="Character Name"
