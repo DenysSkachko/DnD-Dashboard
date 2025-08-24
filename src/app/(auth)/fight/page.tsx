@@ -13,6 +13,7 @@ import {
   useDeleteEnemy,
   useFinishFight,
 } from '@/queries/fightQueries'
+import { useCharacterCombat } from '@/queries/fightQueries'
 
 import InitiativeModal from './InitiativeModal'
 import EnemyFormModal from './EnemyFormModal'
@@ -23,6 +24,7 @@ import DMFooter from './DMFooter'
 
 import ActionButton from '@/ui/ActionButton'
 import Input from '@/ui/Input'
+import { Loader } from '@/ui/Loader'
 
 export default function CombatPage() {
   const { account } = useAccount()
@@ -39,6 +41,9 @@ export default function CombatPage() {
   const finishFight = useFinishFight(activeFight?.id)
 
   const normalizeNumber = (val: number | '') => (val === '' ? 0 : val)
+
+  const { data: characterCombat } = useCharacterCombat(account?.id)
+  const initiativeBonus = characterCombat?.initiative_bonus ?? 0
 
   // --- state ---
   const [initiativeInput, setInitiativeInput] = useState<number | ''>('')
@@ -62,11 +67,7 @@ export default function CombatPage() {
   const isDM = account?.character_name === 'DM'
 
   if (isLoading) {
-    return (
-      <div className="flex items-center justify-center h-screen text-light">
-        <p>Загрузка...</p>
-      </div>
-    )
+    return <Loader />
   }
 
   const myParticipant = participants.find(p => String(p.account_id) === String(account?.id))
@@ -134,6 +135,10 @@ export default function CombatPage() {
           value={initiativeInput}
           onChange={e => setInitiativeInput(e.target.value === '' ? '' : Number(e.target.value))}
         />
+        <div className="mt-2 text-sm text-text-alt flex gap-2 justify-between">
+          <span>Твой бонус к инициативе:</span>
+          <span className="font-bold text-accent">{initiativeBonus}</span>
+        </div>
         <ActionButton type="save" onClick={() => handleJoin(initiativeInput)} />
       </div>
     )
@@ -151,6 +156,7 @@ export default function CombatPage() {
           handleJoin(initiativeInput)
           setShowInitiativeModal(false)
         }}
+        initiativeBonus={initiativeBonus}
       />
 
       <div className="pb-16 p-4">
@@ -166,7 +172,7 @@ export default function CombatPage() {
                 <ActionButton type="edit" onClick={() => setShowInitiativeModal(true)} />
               </div>
             ) : (
-              <div className="flex gap-2 mb-4 justify-end">
+              <div className="flex gap-2 mb-4 justify-start">
                 <ActionButton type="delete" onClick={() => finishFight.mutate()} />
                 <ActionButton type="add" onClick={openAddEnemyForm} />
               </div>

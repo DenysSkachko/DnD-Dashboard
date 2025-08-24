@@ -10,6 +10,7 @@ import FormTitle from '@/ui/FormTitle'
 import SectionItem from '@/ui/SectionItem'
 import ActionButton from '@/ui/ActionButton'
 import { useEditableSection } from '@/hooks/useEditableSection'
+import { Loader } from '@/ui/Loader'
 
 const FIELDS = ['character_name', 'race', 'class'] as const
 const FIELD_LABELS: Record<typeof FIELDS[number], string> = {
@@ -46,7 +47,7 @@ const CharacterSection = () => {
     }
   }, [character, isLoading, setEditMode, setLocalItem])
 
-  if (isLoading) return <p className="text-gray-400 italic">Проверяем персонажа...</p>
+  if (isLoading) return <Loader />
 
   return (
     <div className="flex flex-col gap-3 rounded-md">

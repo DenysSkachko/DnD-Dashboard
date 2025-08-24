@@ -1,8 +1,8 @@
-"use client"
-import { useState } from "react"
-import { Heart } from "lucide-react"
-import ActionButton from "@/ui/ActionButton"
-import { useUpdateCharacterCombat } from "@/queries/characterCombatQueries"
+'use client'
+import { useState } from 'react'
+import { Heart } from 'lucide-react'
+import ActionButton from '@/ui/ActionButton'
+import { useUpdateCharacterCombat } from '@/queries/characterCombatQueries'
 
 type PlayerHPProps = {
   combat: {
@@ -31,14 +31,14 @@ export default function PlayerHP({ combat }: PlayerHPProps) {
 
   return (
     <div className="px-5 pb-5">
-      <div className="bg-dark-hover border border-alt rounded-md shadow-md p-2">
+      <div className="bg-dark-hover border border-alt rounded-md p-2">
         {editingHp ? (
           <div className="flex gap-3 items-center">
             <input
               type="number"
               value={tempHp ?? 0}
               onChange={e => setTempHp(Number(e.target.value))}
-              className="w-full bg-dark-hover border border-alt rounded text-light px-2 py-1 text-2xl outline-none focus:border-accent appearance-none [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
+              className="w-full bg-alt border border-alt rounded text-light px-2 py-1 text-2xl outline-none focus:border-accent appearance-none [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
             />
             <div className="flex gap-2">
               <ActionButton type="save" onClick={handleSaveHp} />
@@ -57,7 +57,7 @@ export default function PlayerHP({ combat }: PlayerHPProps) {
               <div className="flex items-center gap-2">
                 <Heart
                   className={`w-5 h-5 ${
-                    hpPercent === 100 ? "fill-red-500 text-red-500" : "text-red-400"
+                    hpPercent === 100 ? 'fill-red-500 text-red-500' : 'text-red-400'
                   }`}
                 />
                 <span className="text-sm font-semibold text-red-400">HP</span>

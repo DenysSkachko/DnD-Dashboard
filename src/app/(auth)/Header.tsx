@@ -6,24 +6,21 @@ import { useRouter } from 'next/navigation'
 import { useAccount } from '@/context/AccountContext'
 import ActionButton from '@/ui/ActionButton'
 import { motion, AnimatePresence } from 'framer-motion'
-import {
-  Home,
-  Package,
-  Edit,
-  Sword,
-} from 'lucide-react'
+import { Home, Package, Edit, Sword } from 'lucide-react'
 
 export default function Header() {
   const [menuOpen, setMenuOpen] = useState(false)
   const router = useRouter()
-  const { logout } = useAccount()
+  const { account, logout } = useAccount()
+
+  const isDM = account?.character_name === 'DM'
 
   const navLinks = [
     { href: '/', label: 'Home', icon: Home },
     { href: '/inventory', label: 'Inventory', icon: Package },
     { href: '/edit', label: 'Edit', icon: Edit },
     { href: '/fight', label: 'Fight', icon: Sword },
-  ]
+  ].filter(link => (isDM ? ['/', '/fight'].includes(link.href) : true)) // фильтруем для DM
 
   const handleLogout = () => {
     logout()
@@ -32,13 +29,12 @@ export default function Header() {
 
   return (
     <motion.header
-      className="bg-gradient-to-l from-dark via-dark-hover to-dark p-4 relative z-50"
+      className="bg-gradient-to-l from-dark via-dark-hover to-dark px-5 py-2 relative z-50"
       initial={{ y: -80, opacity: 0 }}
       animate={{ y: 0, opacity: 1 }}
       transition={{ type: 'spring', stiffness: 70 }}
     >
       <div className="container mx-auto flex justify-end items-center z-50">
-        {/* Только бургер */}
         <button
           className="w-11 h-11 bg-dark-hover text-3xl text-accent rounded-md flex items-center justify-center cursor-pointer"
           onClick={() => setMenuOpen(true)}
@@ -50,7 +46,6 @@ export default function Header() {
       <AnimatePresence>
         {menuOpen && (
           <>
-            {/* Оверлей */}
             <motion.div
               key="overlay"
               className="fixed inset-0 bg-black/60 z-40"
@@ -61,16 +56,14 @@ export default function Header() {
               onClick={() => setMenuOpen(false)}
             />
 
-            {/* Выпадающее меню */}
             <motion.nav
               key="menu"
               initial={{ y: -100, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
               exit={{ y: -100, opacity: 0 }}
               transition={{ duration: 0.4, ease: 'easeInOut' }}
-              className="fixed top-0 left-0 w-full bg-dark p-4 pb-6 rounded-b-[40px] z-50 shadow-lg"
+              className="fixed top-0 left-0 w-full bg-dark pt-2 px-5 pb-10 rounded-b-[40px] z-50 shadow-lg"
             >
-              {/* Шапка меню с кнопками */}
               <div className="container mx-auto flex justify-end items-center gap-2 mb-6">
                 <ActionButton
                   type="delete"
@@ -87,7 +80,6 @@ export default function Header() {
                 </button>
               </div>
 
-              {/* Линки */}
               <div className="grid grid-cols-2 gap-4 text-center">
                 {navLinks.map(({ href, label, icon: Icon }) => (
                   <a

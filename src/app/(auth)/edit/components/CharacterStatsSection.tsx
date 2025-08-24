@@ -18,6 +18,7 @@ import {
 } from 'react-icons/gi'
 import ActionButton from '@/ui/ActionButton'
 import { useEditableSection } from '@/hooks/useEditableSection'
+import { Loader } from '@/ui/Loader'
 
 const FIELDS = [
   'strength',
@@ -90,7 +91,7 @@ const CharacterStatsSection = () => {
       </div>
 
       {isLoading ? (
-        <p>Загрузка характеристик...</p>
+        <Loader />
       ) : editMode ? (
         <div className="flex flex-col gap-4 max-w-sm">
           {FIELDS.map(field => (

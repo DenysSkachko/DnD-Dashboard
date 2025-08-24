@@ -22,7 +22,7 @@ export default function PlayerMain({ character }: PlayerMainProps) {
         />
       </div>
       <div>
-        <div className="rounded-r-lg bg-dark-hover px-6 py-2 border-b border-t border-r border-alt">
+        <div className="rounded-r-lg bg-alt px-6 py-2 border-b border-t border-r border-alt">
           <h2 className="text-4xl font-extrabold text-center text-light tracking-wide drop-shadow-lg">
             {character.character_name}
           </h2>

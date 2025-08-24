@@ -309,3 +309,23 @@ export const useDeleteEnemy = (fightId?: number) => {
     },
   })
 }
+
+type CharacterCombat = {
+  initiative_bonus: number
+}
+export const useCharacterCombat = (accountId?: string) => {
+  return useQuery<CharacterCombat | null>({
+    queryKey: ['characterCombat', accountId],
+    queryFn: async () => {
+      if (!accountId) return null
+      const { data, error } = await supabase
+        .from('character_combat')
+        .select('initiative_bonus')
+        .eq('character_id', accountId)
+        .single()
+      if (error) throw error
+      return data
+    },
+    enabled: !!accountId,
+  })
+}

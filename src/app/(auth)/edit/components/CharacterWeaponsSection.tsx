@@ -11,6 +11,7 @@ import ActionButton from '@/ui/ActionButton'
 import WeaponCard from '@/ui/WeaponCard'
 import { useEditableSection } from '@/hooks/useEditableSection'
 import WeaponForm from './forms/WeaponForm'
+import { Loader } from '@/ui/Loader'
 
 const diceOptions = ['d4', 'd6', 'd8', 'd10']
 
@@ -55,7 +56,7 @@ const CharacterWeaponsSection = () => {
     deleteFn: (id) => deleteWeapon.mutateAsync(id),
   })
 
-  if (isLoading) return <p>Loading weapons...</p>
+  if (isLoading) return <Loader />
 
   const statOptions = stats
     ? Object.keys(stats).filter(

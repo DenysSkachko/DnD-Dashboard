@@ -14,7 +14,7 @@ export default function DMFooter({ enemies, onEnemyClick }: Props) {
         <button
           key={enemy.id}
           onClick={() => onEnemyClick(enemy)}
-          className="px-3 py-1 rounded hover:bg-accent-hover cursor-pointer"
+          className="px-6 py-2 rounded bg-red-500 cursor-pointer"
         >
           {enemy.name}
         </button>

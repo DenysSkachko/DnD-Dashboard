@@ -10,6 +10,7 @@ import ActionButton from '@/ui/ActionButton'
 import SpellCard from '@/ui/SpellCard'
 import { useEditableSection } from '@/hooks/useEditableSection'
 import SpellForm from './forms/SpellForm'
+import { Loader } from '@/ui/Loader'
 
 const CharacterSpellsSection = () => {
   const { data: spells = [], isLoading, refetch } = useCharacterSpells()
@@ -47,7 +48,7 @@ const CharacterSpellsSection = () => {
     deleteFn: id => deleteSpell.mutateAsync(id),
   })
 
-  if (isLoading) return <p>Loading spells...</p>
+  if (isLoading) return <Loader />
 
   const handleAddNew = async () => {
     await addNew()
