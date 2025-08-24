@@ -12,8 +12,8 @@ import ActionButton from '@/ui/ActionButton'
 import InventoryCard from '@/ui/InventoryCard'
 import { useEditableSection } from '@/hooks/useEditableSection'
 import InventoryForm from './InventoryForm'
-import { useState } from 'react'
-import { FaCoins, FaSortAmountDown, FaSortAmountUp } from 'react-icons/fa'
+import { useState, useEffect } from 'react'
+import { FaSortAmountDown, FaSortAmountUp } from 'react-icons/fa'
 import { Loader } from '@/ui/Loader'
 
 const CharacterInventorySection = () => {
@@ -36,7 +36,7 @@ const CharacterInventorySection = () => {
     deleteExisting,
   } = useEditableSection<CharacterInventory>({
     data: inventory,
-    emptyItem: { item_name: '', quantity: null, description: '', gold: null },
+    emptyItem: { item_name: '', quantity: 0, description: '', gold: 0 },
     stripKeys: ['id', 'character_id'],
     createFn: item =>
       createItem.mutateAsync(item as Omit<CharacterInventory, 'id' | 'character_id'>),
@@ -50,11 +50,18 @@ const CharacterInventorySection = () => {
 
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc')
 
-  if (isLoading) {
-  return (
-    <Loader />
-  )
-}
+  // Сортируем localList при изменении sortOrder
+  useEffect(() => {
+    setLocalList(prev =>
+      [...prev].sort((a, b) => {
+        const goldA = a.gold ?? 0
+        const goldB = b.gold ?? 0
+        return sortOrder === 'asc' ? goldA - goldB : goldB - goldA
+      })
+    )
+  }, [sortOrder, setLocalList])
+
+  if (isLoading) return <Loader />
 
   const handleAddNew = async () => {
     await addNew()
@@ -68,27 +75,17 @@ const CharacterInventorySection = () => {
     await deleteExisting(idx)
   }
 
-  const sortedList = [...localList].sort((a, b) => {
-    const goldA = a.gold ?? 0
-    const goldB = b.gold ?? 0
-    return sortOrder === 'asc' ? goldA - goldB : goldB - goldA
-  })
-
   return (
     <div className="flex flex-col gap-3 p-6">
       <div className="flex justify-between items-center">
         <FormTitle>Инвентарь</FormTitle>
         <div className="flex items-center gap-2">
           <button
-            className="w-11 h-11 bg-dark-hover text-3xl text-accent  rounded-md flex items-center justify-center cursor-pointer"
+            className="w-11 h-11 bg-dark-hover text-3xl text-accent rounded-md flex items-center justify-center cursor-pointer"
             onClick={() => setSortOrder(prev => (prev === 'asc' ? 'desc' : 'asc'))}
             title="Сортировать по золоту"
           >
-            {sortOrder === 'asc' ? (
-              <FaSortAmountUp />
-            ) : (
-              <FaSortAmountDown />
-            )}
+            {sortOrder === 'asc' ? <FaSortAmountUp /> : <FaSortAmountDown />}
           </button>
           <ActionButton type="add" onClick={startAdd} />
         </div>
@@ -104,10 +101,10 @@ const CharacterInventorySection = () => {
       )}
 
       <ul className="flex flex-col gap-2">
-        {sortedList.map((item, idx) => {
+        {localList.map((item, idx) => {
           const isEditing = editingIdx === idx
           return (
-            <div key={idx} className="flex flex-col gap-2">
+            <li key={item.id ?? `temp-${idx}`} className="flex flex-col gap-2">
               {!isEditing ? (
                 <InventoryCard
                   name={item.item_name}
@@ -129,7 +126,7 @@ const CharacterInventorySection = () => {
                   onCancel={() => setEditingIdx(null)}
                 />
               )}
-            </div>
+            </li>
           )
         })}
       </ul>

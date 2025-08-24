@@ -20,6 +20,7 @@ export default function Header() {
     { href: '/inventory', label: 'Inventory', icon: Package },
     { href: '/edit', label: 'Edit', icon: Edit },
     { href: '/fight', label: 'Fight', icon: Sword },
+    { href: '/spell', label: 'Spell', icon: Home },
   ].filter(link => (isDM ? ['/', '/fight'].includes(link.href) : true)) // фильтруем для DM
 
   const handleLogout = () => {
