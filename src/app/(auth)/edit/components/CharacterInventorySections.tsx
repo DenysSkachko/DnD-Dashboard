@@ -1,104 +1,90 @@
-import {
-  useCharacterInventory,
-  useCreateInventoryItem,
-  useUpdateInventoryItem,
-  useDeleteInventoryItem,
-  type CharacterInventory,
-} from '@/queries/characterInventoryQueries'
-import Input from '@/ui/Input'
+'use client'
+
+import { useState } from 'react'
+import { useCharacterInventory, type CharacterInventory } from '@/queries/characterInventoryQueries'
 import FormTitle from '@/ui/FormTitle'
 import ActionButton from '@/ui/ActionButton'
 import InventoryCard from '@/ui/InventoryCard'
-import { useEditableSection } from '@/hooks/useEditableSection'
 import InventoryForm from './forms/InventoryForm'
 import { Loader } from '@/ui/Loader'
 
-const CharacterInventorySection = () => {
-  const { data: inventory = [], isLoading } = useCharacterInventory()
-  const createItem = useCreateInventoryItem()
-  const updateItem = useUpdateInventoryItem()
-  const deleteItem = useDeleteInventoryItem()
+const EditableInventoryItem = ({
+  item,
+  onSave,
+  onDelete,
+  onCancel,
+}: {
+  item: CharacterInventory
+  onSave: (id: number, updated: Partial<CharacterInventory>) => void | Promise<void>
+  onDelete: (id: number) => void | Promise<void>
+  onCancel: () => void
+}) => {
+  const [draft, setDraft] = useState(item)
 
+  return (
+    <InventoryForm
+      item={draft}
+      onChange={(field, value) => setDraft({ ...draft, [field]: value })}
+      onSave={() => onSave(item.id, draft)}
+      onDelete={() => onDelete(item.id)}
+      onCancel={onCancel}
+    />
+  )
+}
+
+const CharacterInventorySection = () => {
   const {
-    localList,
-    setLocalList,
-    editingIdx,
-    setEditingIdx,
+    isLoading,
+    list,
     newItem,
+    editingId,
+    startAddItem,
+    cancelAddItem,
     setNewItem,
-    startAdd,
-    cancelAdd,
-    addNew,
-    saveExisting,
-    deleteExisting,
-  } = useEditableSection<CharacterInventory>({
-    data: inventory,
-    emptyItem: { item_name: '', quantity: null, description: '', gold: null },
-    stripKeys: ['id', 'character_id'],
-    createFn: item =>
-      createItem.mutateAsync(item as Omit<CharacterInventory, 'id' | 'character_id'>),
-    updateFn: (id, item) =>
-      updateItem.mutateAsync({
-        id,
-        ...(item as Omit<CharacterInventory, 'id' | 'character_id'>),
-      }),
-    deleteFn: id => deleteItem.mutateAsync(id),
-  })
+    saveNewItem,
+    startEditItem,
+    cancelEditItem,
+    saveEditItem,
+    deleteItem,
+  } = useCharacterInventory()
 
   if (isLoading) return <Loader />
-
-  const handleAddNew = async () => {
-    await addNew()
-  }
-
-  const handleSaveExisting = async (idx: number) => {
-    await saveExisting(idx)
-  }
-
-  const handleDeleteExisting = async (idx: number) => {
-    await deleteExisting(idx)
-  }
 
   return (
     <div className="flex flex-col gap-3">
       <div className="flex justify-between items-center">
         <FormTitle>Инвентарь</FormTitle>
-        <ActionButton type="add" onClick={startAdd} />
+        <ActionButton type="add" onClick={startAddItem} />
       </div>
 
       {newItem && (
         <InventoryForm
           item={newItem}
           onChange={(field, value) => setNewItem({ ...newItem, [field]: value })}
-          onSave={handleAddNew}
-          onCancel={cancelAdd}
+          onSave={saveNewItem}
+          onCancel={cancelAddItem}
         />
       )}
 
       <ul className="flex flex-col gap-2">
-        {localList.map((item, idx) => {
-          const isEditing = editingIdx === idx
+        {list.map((item) => {
+          const isEditing = editingId === item.id
           return (
-            <div key={idx} className="flex flex-col gap-2">
+            <div key={item.id} className="flex flex-col gap-2">
               {!isEditing ? (
                 <InventoryCard
                   name={item.item_name}
                   quantity={item.quantity ?? 0}
                   gold={item.gold ?? 0}
                   description={item.description || ' '}
-                  onEdit={() => setEditingIdx(idx)}
+                  onEdit={() => startEditItem(item.id)}
                 />
               ) : (
-                <InventoryForm
+                <EditableInventoryItem
                   item={item}
-                  onChange={(field, value) => {
-                    const copy = [...localList]
-                    copy[idx] = { ...item, [field]: value }
-                    setLocalList(copy)
-                  }}
-                  onSave={() => handleSaveExisting(idx)}
-                  onDelete={() => handleDeleteExisting(idx)}
-                  onCancel={() => setEditingIdx(null)}
+                  onSave={saveEditItem}
+                  onDelete={deleteItem}
+                  onCancel={cancelEditItem}
                 />
               )}
             </div>

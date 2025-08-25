@@ -12,8 +12,8 @@ import {
   useUpdateEnemy,
   useDeleteEnemy,
   useFinishFight,
+  useCharacterCombat,
 } from '@/queries/fightQueries'
-import { useCharacterCombat } from '@/queries/fightQueries'
 
 import InitiativeModal from './InitiativeModal'
 import EnemyFormModal from './EnemyFormModal'
@@ -21,8 +21,8 @@ import EnemyHpModal from './EnemyHpModal'
 import ParticipantItem from './ParticipantItem'
 import PlayerFooter from './PlayerFooter'
 import DMFooter from './DMFooter'
+import ActionButton from '@/ui/ActionButtonFight'
 
-import ActionButton from '@/ui/ActionButton'
 import Input from '@/ui/Input'
 import { Loader } from '@/ui/Loader'
 
@@ -40,10 +40,13 @@ export default function CombatPage() {
   const deleteEnemy = useDeleteEnemy(activeFight?.id)
   const finishFight = useFinishFight(activeFight?.id)
 
-  const normalizeNumber = (val: number | '') => (val === '' ? 0 : val)
+  const normalizeNumber = (val: number | '') => {
+    if (val === '' || isNaN(Number(val))) return 0
+    return Math.max(0, Number(val))
+  }
 
   const { data: characterCombat } = useCharacterCombat(account?.id)
-  const initiativeBonus = characterCombat?.initiative_bonus ?? 0
+  const initiativeBonus = characterCombat?.initiative ?? 0
 
   // --- state ---
   const [initiativeInput, setInitiativeInput] = useState<number | ''>('')
@@ -127,25 +130,60 @@ export default function CombatPage() {
   // --- UI ---
   if (activeFight && !isDM && !participantJoined) {
     return (
-      <div className="flex flex-col items-center justify-center h-screen text-light gap-4">
-        <h2 className="text-xl font-bold">Вход в бой</h2>
-        <Input
-          label="Инициатива"
+      <div
+        className="flex flex-col items-center justify-center h-screen gap-6
+      px-6
+      bg-gradient-to-br from-red-950/90 via-black/80 to-stone-900/80
+      backdrop-blur-md"
+      >
+        {/* Заголовок */}
+        <h2
+          className="text-2xl font-extrabold uppercase tracking-widest text-light
+        drop-shadow-[0_0_6px_rgba(239,68,68,0.8)] text-center"
+        >
+          Вход в бой
+        </h2>
+
+        {/* Input инициативы */}
+        <input
           type="number"
           value={initiativeInput}
           onChange={e => setInitiativeInput(e.target.value === '' ? '' : Number(e.target.value))}
+          className="w-full max-w-xs h-14 pl-6 rounded-2xl text-2xl font-extrabold outline-none
+        bg-gradient-to-br from-red-900 via-red-800 to-red-950
+        text-red-400 shadow-[0_0_15px_rgba(255,0,0,0.6)]
+        focus:border-red-400 focus:shadow-[0_0_25px_rgba(255,80,80,0.8)]
+        transition-all duration-300
+        [&::-webkit-inner-spin-button]:appearance-none
+        [&::-webkit-outer-spin-button]:appearance-none"
+          placeholder="0"
         />
-        <div className="mt-2 text-sm text-text-alt flex gap-2 justify-between">
+
+        {/* Бонус инициативы */}
+        <div className="w-full max-w-xs flex justify-between text-sm text-stone-300 px-2">
           <span>Твой бонус к инициативе:</span>
-          <span className="font-bold text-accent">{initiativeBonus}</span>
+          <span className="font-bold text-red-400 drop-shadow-[0_0_6px_rgba(239,68,68,0.8)]">
+            {initiativeBonus >= 0 ? `+${initiativeBonus}` : initiativeBonus}
+          </span>
         </div>
-        <ActionButton type="save" onClick={() => handleJoin(initiativeInput)} />
+
+        {/* Кнопка Войти */}
+        <ActionButton
+          type="save"
+          onClick={() => handleJoin(initiativeInput)}
+          className="w-14 h-14 text-2xl"
+        />
       </div>
     )
   }
 
   return (
-    <div className="relative min-h-screen bg-dark w-screen text-light">
+    <div
+      className="relative min-h-screen w-screen text-light 
+  bg-gradient-to-br from-black via-red-900 to-red-950
+  animate-danger-gradient overflow-hidden"
+    >
+      <div className="absolute inset-0 bg-red-700/20 animate-danger-pulse"></div>
       {/* --- Модалка инициативы --- */}
       <InitiativeModal
         open={showInitiativeModal}
@@ -184,8 +222,8 @@ export default function CombatPage() {
                   <ParticipantItem
                     participant={p}
                     isDM={isDM}
-                    onEditEnemy={() => handleEditEnemy(p)}
-                    onDeleteEnemy={() => deleteEnemy.mutate(p.id)}
+                    onEditEnemy={() => p.is_enemy && handleEditEnemy(p)}
+                    onDeleteEnemy={() => p.is_enemy && deleteEnemy.mutate(p.id)}
                   />
                 </li>
               ))}
@@ -195,7 +233,7 @@ export default function CombatPage() {
       </div>
 
       {/* --- Footer игрока --- */}
-      {myParticipant && !isDM && (
+      {activeFight && myParticipant && !isDM && (
         <PlayerFooter
           myParticipant={myParticipant}
           onSave={(v: number | '') => updateHp.mutate(normalizeNumber(v))}
@@ -211,7 +249,7 @@ export default function CombatPage() {
       )}
 
       {/* --- Модалки врагов --- */}
-      {showEnemyForm && (
+      {activeFight && showEnemyForm && (
         <EnemyFormModal
           open={showEnemyForm}
           onClose={() => setShowEnemyForm(false)}
@@ -229,7 +267,7 @@ export default function CombatPage() {
         />
       )}
 
-      {showEnemyHpModal && selectedEnemy && (
+      {activeFight && showEnemyHpModal && selectedEnemy && (
         <EnemyHpModal
           open={showEnemyHpModal}
           onClose={() => setShowEnemyHpModal(false)}

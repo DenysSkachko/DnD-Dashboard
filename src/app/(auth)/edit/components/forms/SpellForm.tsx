@@ -1,3 +1,5 @@
+'use client'
+
 import Input from '@/ui/Input'
 import Select from '@/ui/Select'
 import Checkbox from '@/ui/Checkbox'
@@ -9,7 +11,7 @@ const actionOptions = ['main', 'bonus']
 
 interface SpellFormProps {
   spell: Partial<CharacterSpell>
-  onChange: (spell: Partial<CharacterSpell>) => void
+  onChange: (field: keyof CharacterSpell, value: any) => void
   onSave: () => void
   onCancel: () => void
   onDelete?: () => void
@@ -22,38 +24,38 @@ const SpellForm = ({ spell, onChange, onSave, onCancel, onDelete, isNew }: Spell
       <Input
         label="Название"
         value={spell.name || ''}
-        onChange={e => onChange({ ...spell, name: e.target.value })}
+        onChange={e => onChange('name', e.target.value)}
       />
       <Select
         label="Уровень"
-        value={String(spell.level || 0)}
+        value={String(spell.level ?? 0)}
         options={levelOptions}
-        onChange={val => onChange({ ...spell, level: Number(val) })}
+        onChange={val => onChange('level', Number(val))}
       />
       <Select
         label="Действие"
         value={spell.action || 'main'}
         options={actionOptions}
-        onChange={val => onChange({ ...spell, action: val as 'main' | 'bonus' })}
+        onChange={val => onChange('action', val as 'main' | 'bonus')}
       />
       <Input
         label="Расстояние"
         value={spell.range || ''}
-        onChange={e => onChange({ ...spell, range: e.target.value })}
+        onChange={e => onChange('range', e.target.value)}
       />
       <Input
         label="Длительность"
         value={spell.duration || ''}
-        onChange={e => onChange({ ...spell, duration: e.target.value })}
+        onChange={e => onChange('duration', e.target.value)}
       />
       <Input
         label="Описание"
         value={spell.description || ''}
-        onChange={e => onChange({ ...spell, description: e.target.value })}
+        onChange={e => onChange('description', e.target.value)}
       />
       <Checkbox
         checked={spell.concentration || false}
-        onChange={val => onChange({ ...spell, concentration: val })}
+        onChange={val => onChange('concentration', val)}
         label="Концентрация"
       />
 

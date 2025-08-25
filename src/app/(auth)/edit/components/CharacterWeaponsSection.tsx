@@ -1,61 +1,67 @@
+'use client'
+
+import { useState } from 'react'
 import {
   useCharacterWeapons,
-  useCreateWeapon,
-  useUpdateWeapon,
-  useDeleteWeapon,
   type CharacterWeapon,
 } from '@/queries/characterWeaponsQueries'
 import { useCharacterStats, type CharacterStat } from '@/queries/characterStatsQueries'
 import FormTitle from '@/ui/FormTitle'
 import ActionButton from '@/ui/ActionButton'
 import WeaponCard from '@/ui/WeaponCard'
-import { useEditableSection } from '@/hooks/useEditableSection'
 import WeaponForm from './forms/WeaponForm'
 import { Loader } from '@/ui/Loader'
 
 const diceOptions = ['d4', 'd6', 'd8', 'd10']
 
-const CharacterWeaponsSection = () => {
-  const { data: weapons = [], isLoading } = useCharacterWeapons()
-  const { data: stats } = useCharacterStats()
-  const createWeapon = useCreateWeapon()
-  const updateWeapon = useUpdateWeapon()
-  const deleteWeapon = useDeleteWeapon()
+const EditableWeaponItem = ({
+  weapon,
+  statOptions,
+  onSave,
+  onDelete,
+  onCancel,
+}: {
+  weapon: CharacterWeapon
+  statOptions: string[]
+  onSave: (id: number, updated: CharacterWeapon) => void | Promise<void>
+  onDelete: (id: number) => void | Promise<void>
+  onCancel: () => void
+}) => {
+  const [draft, setDraft] = useState<Partial<CharacterWeapon>>(weapon)
 
+  const handleChange = (field: keyof CharacterWeapon, value: any) => {
+    setDraft(prev => ({ ...prev, [field]: value }))
+  }
+
+  return (
+    <WeaponForm
+      weapon={draft}
+      onChange={handleChange}
+      onSave={() => onSave(weapon.id, draft as CharacterWeapon)}
+      onDelete={() => onDelete(weapon.id)}
+      onCancel={onCancel}
+      isNew={false}
+    />
+  )
+}
+
+const CharacterWeaponsSection = () => {
   const {
-    localList,
-    setLocalList,
-    editingIdx,
-    setEditingIdx,
+    isLoading,
+    list,
     newItem,
+    editingId,
+    startAddItem,
+    cancelAddItem,
     setNewItem,
-    startAdd,
-    cancelAdd,
-    addNew,
-    saveExisting,
-    deleteExisting,
-  } = useEditableSection<CharacterWeapon>({
-    data: weapons,
-    emptyItem: {
-      name: '',
-      damage_dice: '',
-      damage_stat: '',
-      extra_damage: null,
-      extra_attack: null,
-      use_proficiency: false,
-    },
-    stripKeys: ['id', 'character_id'],
-    createFn: item =>
-      createWeapon.mutateAsync(
-        item as Omit<CharacterWeapon, 'id' | 'character_id' | 'attack_bonus' | 'damage'>
-      ),
-    updateFn: (id, item) =>
-      updateWeapon.mutateAsync({
-        id,
-        ...(item as Omit<CharacterWeapon, 'id' | 'character_id' | 'attack_bonus' | 'damage'>),
-      }),
-    deleteFn: id => deleteWeapon.mutateAsync(id),
-  })
+    saveNewItem,
+    startEditItem,
+    cancelEditItem,
+    saveEditItem,
+    deleteItem,
+  } = useCharacterWeapons()
+
+  const { data: stats } = useCharacterStats()
 
   if (isLoading) return <Loader />
 
@@ -65,10 +71,8 @@ const CharacterWeaponsSection = () => {
       )
     : []
 
-  const calcDamageAndAttack = (
-    w: Omit<CharacterWeapon, 'id' | 'character_id' | 'attack_bonus' | 'damage'>
-  ) => {
-    if (!w.damage_dice || !w.damage_stat) return { damage: '-', attack_bonus: 0 }
+  const calcDamageAndAttack = (w: CharacterWeapon) => {
+    if (!w.damage_dice || !w.damage_stat || !stats) return { damage: '-', attack_bonus: 0 }
     const statValue = Number((stats as any)[w.damage_stat as keyof CharacterStat] || 0)
     const damageStr = `${w.damage_dice} + ${statValue}${
       w.extra_damage ? ` + ${w.extra_damage}` : ''
@@ -80,61 +84,47 @@ const CharacterWeaponsSection = () => {
     return { damage: damageStr, attack_bonus: attackBonus }
   }
 
-  const handleAddNew = async () => {
-    await addNew()
-  }
-  const handleSaveExisting = async (idx: number) => {
-    await saveExisting(idx)
-  }
-  const handleDeleteExisting = async (idx: number) => {
-    await deleteExisting(idx)
+  const handleNewItemChange = (field: keyof CharacterWeapon, value: any) => {
+    setNewItem(prev => ({ ...prev, [field]: value }))
   }
 
   return (
     <div className="flex flex-col gap-3">
       <div className="flex justify-between items-center">
         <FormTitle>Оружие</FormTitle>
-        <ActionButton type="add" onClick={startAdd} />
+        <ActionButton type="add" onClick={startAddItem} />
       </div>
 
       {newItem && (
         <WeaponForm
           weapon={newItem}
-          statOptions={statOptions}
-          diceOptions={diceOptions}
-          onChange={w => setNewItem(w)}
-          onSave={handleAddNew}
-          onCancel={cancelAdd}
+          onChange={handleNewItemChange}
+          onSave={saveNewItem}
+          onCancel={cancelAddItem}
           isNew
         />
       )}
 
       <ul className="flex flex-col gap-2">
-        {localList.map((w, idx) => {
-          const isEditing = editingIdx === idx
-          const { damage, attack_bonus } = calcDamageAndAttack(w as any)
+        {list.map(w => {
+          const isEditing = editingId === w.id
+          const { damage, attack_bonus } = calcDamageAndAttack(w)
           return (
-            <div key={idx} className="flex flex-col gap-2">
+            <div key={w.id} className="flex flex-col gap-2">
               {!isEditing ? (
                 <WeaponCard
                   name={w.name}
                   damage={damage}
                   attack_bonus={attack_bonus}
-                  onEdit={() => setEditingIdx(idx)}
+                  onEdit={() => startEditItem(w.id)}
                 />
               ) : (
-                <WeaponForm
+                <EditableWeaponItem
                   weapon={w}
                   statOptions={statOptions}
-                  diceOptions={diceOptions}
-                  onChange={newW => {
-                    const copy = [...localList]
-                    copy[idx] = newW
-                    setLocalList(copy)
-                  }}
-                  onSave={() => handleSaveExisting(idx)}
-                  onDelete={() => handleDeleteExisting(idx)}
-                  onCancel={() => setEditingIdx(null)}
+                  onSave={saveEditItem}
+                  onDelete={deleteItem}
+                  onCancel={cancelEditItem}
                 />
               )}
             </div>

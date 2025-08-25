@@ -3,7 +3,7 @@ import ActionButton from '@/ui/ActionButton'
 import { type CharacterInventory } from '@/queries/characterInventoryQueries'
 
 type Props = {
-  item: CharacterInventory
+  item: Partial<CharacterInventory>   // 👈 меняем на Partial
   onChange: (field: keyof CharacterInventory, value: any) => void
   onSave: () => void
   onCancel: () => void
@@ -15,7 +15,7 @@ const InventoryForm = ({ item, onChange, onSave, onCancel, onDelete }: Props) =>
     <div className="flex flex-col gap-2">
       <Input
         label="Название предмета"
-        value={item.item_name}
+        value={item.item_name ?? ''}
         onChange={(e) => onChange('item_name', e.target.value)}
       />
       <Input
@@ -28,7 +28,7 @@ const InventoryForm = ({ item, onChange, onSave, onCancel, onDelete }: Props) =>
       />
       <Input
         type="number"
-        label="Стоимость"
+        label="Стоимость (Gold)"
         value={item.gold ?? ''}
         onChange={(e) =>
           onChange('gold', e.target.value === '' ? null : Number(e.target.value))
@@ -36,7 +36,7 @@ const InventoryForm = ({ item, onChange, onSave, onCancel, onDelete }: Props) =>
       />
       <Input
         label="Описание"
-        value={item.description || ''}
+        value={item.description ?? ''}
         onChange={(e) => onChange('description', e.target.value)}
       />
       <div className="flex gap-2">

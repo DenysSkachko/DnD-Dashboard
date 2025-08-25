@@ -38,3 +38,60 @@ body {
   display: none !important;
   pointer-events: none !important;
 }
+
+@keyframes danger-gradient {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+.animate-danger-gradient {
+  background-size: 400% 400%;
+  animation: danger-gradient 7s ease infinite;
+}
+
+@keyframes danger-pulse {
+  0%, 100% {
+    opacity: 0.4;
+  }
+  50% {
+    opacity: 0.8;
+  }
+}
+
+.animate-danger-pulse {
+  animation: danger-pulse 3s ease-in-out infinite;
+}
+
+@keyframes pulse-slow {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.85; }
+}
+
+@keyframes pulse-fast {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.1); }
+}
+
+@keyframes flicker {
+  0%, 19%, 21%, 23%, 25%, 54%, 56%, 100% { opacity: 1; }
+  20%, 24%, 55% { opacity: 0.4; }
+}
+
+.animate-pulse-slow {
+  animation: pulse-slow 5s infinite;
+}
+
+.animate-pulse-fast {
+  animation: pulse-fast 1.5s infinite;
+}
+
+.animate-flicker {
+  animation: flicker 3s infinite;
+}

@@ -311,18 +311,32 @@ export const useDeleteEnemy = (fightId?: number) => {
 }
 
 type CharacterCombat = {
-  initiative_bonus: number
+  initiative: number
 }
+
 export const useCharacterCombat = (accountId?: string) => {
   return useQuery<CharacterCombat | null>({
     queryKey: ['characterCombat', accountId],
     queryFn: async () => {
       if (!accountId) return null
+
+      // 1. Получаем персонажа по account_id
+      const { data: character, error: charError } = await supabase
+        .from('characters')
+        .select('id')
+        .eq('account_id', accountId)
+        .single()
+
+      if (charError) throw charError
+      if (!character) return null
+
+      // 2. Достаём combat данные по character.id
       const { data, error } = await supabase
         .from('character_combat')
-        .select('initiative_bonus')
-        .eq('character_id', accountId)
+        .select('initiative')
+        .eq('character_id', character.id)
         .single()
+
       if (error) throw error
       return data
     },

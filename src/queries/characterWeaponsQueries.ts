@@ -1,94 +1,132 @@
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { supabase } from "@/lib/supabaseClient";
-import { useAccount } from "@/context/AccountContext";
+import { useState } from 'react'
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+import { supabase } from '@/lib/supabaseClient'
+import { useAccount } from '@/context/AccountContext'
 
 export type CharacterWeapon = {
-  id: number;
-  character_id: number;
-  name: string;
-  damage_dice: string;        
-  damage_stat: string;        
-  extra_damage: number | null;
-  extra_attack: number | null, 
-  use_proficiency: boolean;
-};
+  id: number
+  character_id: number
+  name: string
+  damage_dice: string
+  damage_stat: string
+  extra_damage: number | null
+  extra_attack: number | null
+  use_proficiency: boolean
+}
 
-// --- Получение оружия ---
 export const useCharacterWeapons = () => {
-  const { account } = useAccount();
-  return useQuery({
-    queryKey: ["character_weapons", account?.id],
+  const { account } = useAccount()
+  const queryClient = useQueryClient()
+
+  // ---- загрузка ----
+  const { data: weapons = [], isLoading } = useQuery({
+    queryKey: ['character_weapons', account?.id],
     queryFn: async (): Promise<CharacterWeapon[]> => {
-      if (!account) throw new Error("Нет аккаунта");
+      if (!account) throw new Error('Нет аккаунта')
       const { data, error } = await supabase
-        .from("character_weapons")
-        .select("*")
-        .eq("character_id", account.id);
-      if (error) throw error;
-      return data;
+        .from('character_weapons')
+        .select('*')
+        .eq('character_id', account.id)
+      if (error) throw error
+      return data
     },
     enabled: !!account,
-  });
-};
+  })
 
-// --- Создание оружия ---
-export const useCreateWeapon = () => {
-  const { account } = useAccount();
-  const queryClient = useQueryClient();
+  // ---- локальные состояния ----
+  const [newItem, setNewItem] = useState<Partial<CharacterWeapon> | null>(null)
+  const [editingId, setEditingId] = useState<number | null>(null)
 
-  return useMutation({
-    mutationFn: async (weapon: Omit<CharacterWeapon, "id" | "character_id">) => {
-      if (!account) throw new Error("Нет аккаунта");
+  // ---- CRUD ----
+  const createMutation = useMutation({
+    mutationFn: async (weapon: Omit<CharacterWeapon, 'id' | 'character_id'>) => {
+      if (!account) throw new Error('Нет аккаунта')
       const { data, error } = await supabase
-        .from("character_weapons")
+        .from('character_weapons')
         .insert([{ ...weapon, character_id: account.id }])
         .select()
-        .single();
-      if (error) throw error;
-      return data;
+        .single()
+      if (error) throw error
+      return data
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["character_weapons", account?.id] });
+      queryClient.invalidateQueries({ queryKey: ['character_weapons', account?.id] })
     },
-  });
-};
+  })
 
-// --- Обновление оружия ---
-export const useUpdateWeapon = () => {
-  const queryClient = useQueryClient();
-  return useMutation({
+  const updateMutation = useMutation({
     mutationFn: async (weapon: Partial<CharacterWeapon> & { id: number }) => {
       const { data, error } = await supabase
-        .from("character_weapons")
+        .from('character_weapons')
         .update(weapon)
-        .eq("id", weapon.id)
+        .eq('id', weapon.id)
         .select()
-        .single();
-      if (error) throw error;
-      return data;
+        .single()
+      if (error) throw error
+      return data
     },
-    onSuccess: (_, weapon) => {
-      queryClient.invalidateQueries({ queryKey: ["character_weapons", weapon.character_id] });
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['character_weapons', account?.id] })
     },
-  });
-};
+  })
 
-// --- Удаление оружия ---
-export const useDeleteWeapon = () => {
-  const queryClient = useQueryClient();
-
-  return useMutation({
+  const deleteMutation = useMutation({
     mutationFn: async (id: number) => {
-      const { error } = await supabase
-        .from("character_weapons")
-        .delete()
-        .eq("id", id);
+      const { error } = await supabase.from('character_weapons').delete().eq('id', id)
+      if (error) throw error
+      return id
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['character_weapons', account?.id] })
+    },
+  })
 
-      if (error) throw error;
-      return id;
-    },
-    onSuccess: (_data, _variables, _context) => {
-      queryClient.invalidateQueries({ queryKey: ["character_weapons"] });
-    },
-  });
-};
+  // ---- функции управления ----
+  const startAddItem = () =>
+    setNewItem({
+      name: '',
+      damage_dice: '',
+      damage_stat: '',
+      extra_damage: null,
+      extra_attack: null,
+      use_proficiency: false,
+    })
+
+  const cancelAddItem = () => setNewItem(null)
+
+  const saveNewItem = async () => {
+    if (!newItem) return
+    await createMutation.mutateAsync(newItem as Omit<CharacterWeapon, 'id' | 'character_id'>)
+    setNewItem(null)
+  }
+
+  const startEditItem = (id: number) => setEditingId(id)
+  const cancelEditItem = () => setEditingId(null)
+
+  const saveEditItem = async (id: number, updated: Partial<CharacterWeapon>) => {
+    await updateMutation.mutateAsync({ id, ...updated })
+    setEditingId(null)
+  }
+
+  const deleteItem = async (id: number) => {
+    await deleteMutation.mutateAsync(id)
+    setEditingId(null)
+  }
+
+  return {
+    isLoading,
+    list: weapons,
+    newItem,
+    editingId,
+
+    // методы
+    setNewItem,
+    startAddItem,
+    cancelAddItem,
+    saveNewItem,
+    startEditItem,
+    cancelEditItem,
+    saveEditItem,
+    deleteItem,
+  }
+}

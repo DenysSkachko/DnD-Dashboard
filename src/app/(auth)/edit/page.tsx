@@ -14,13 +14,13 @@ import CharacterFeaturesSection from './components/CharacterFeaturesSection'
 const tabs = [
   { name: 'Персонаж', component: <CharacterSection /> },
   { name: 'Статы', component: <CharacterStatsSection /> },
+  { name: 'Спасброски', component: <CharacterSavingThrowsSection /> },
   { name: 'Навыки', component: <CharacterSkillsSection /> },
-  { name: 'Сражение', component: <CharacterCombatSection /> },
   { name: 'Инвентарь', component: <CharacterInventorySection /> },
   { name: 'Оружие', component: <CharacterWeaponsSection /> },
   { name: 'Заклинания', component: <CharacterSpellsSection /> },
-  { name: 'Спасброски', component: <CharacterSavingThrowsSection /> },
   { name: 'Особенности', component: <CharacterFeaturesSection/> },
+  { name: 'Сражение', component: <CharacterCombatSection /> },
 ]
 
 const EditPage = () => {

@@ -3,25 +3,26 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
 import { supabase } from "@/lib/supabaseClient"
 import { useAccount } from "@/context/AccountContext"
 
-export type CharacterFeature = {
+export type CharacterInventory = {
   id: number
   character_id: number
-  name: string
+  item_name: string
+  quantity: number | null
   description: string | null
-  level_required: number | null
+  gold: number | null
 }
 
-export const useCharacterFeatures = () => {
+export const useCharacterInventory = () => {
   const { account } = useAccount()
   const queryClient = useQueryClient()
 
   // ---- react-query загрузка ----
-  const { data: features = [], isLoading } = useQuery({
-    queryKey: ["character_features", account?.id],
-    queryFn: async (): Promise<CharacterFeature[]> => {
+  const { data: inventory = [], isLoading } = useQuery({
+    queryKey: ["character_inventory", account?.id],
+    queryFn: async (): Promise<CharacterInventory[]> => {
       if (!account) throw new Error("Нет аккаунта")
       const { data, error } = await supabase
-        .from("character_features")
+        .from("character_inventory")
         .select("*")
         .eq("character_id", account.id)
       if (error) throw error
@@ -31,74 +32,69 @@ export const useCharacterFeatures = () => {
   })
 
   // ---- локальные состояния ----
-  const [newItem, setNewItem] = useState<Partial<CharacterFeature> | null>(null)
+  const [newItem, setNewItem] = useState<Partial<CharacterInventory> | null>(null)
   const [editingId, setEditingId] = useState<number | null>(null)
-  const [selectedLevel, setSelectedLevel] = useState<number | null>(null)
+  const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc")
 
-  // ---- CRUD ----
+  // ---- CRUD мутации ----
   const createMutation = useMutation({
-    mutationFn: async (feature: Omit<CharacterFeature, "id" | "character_id">) => {
+    mutationFn: async (item: Omit<CharacterInventory, "id" | "character_id">) => {
       if (!account) throw new Error("Нет аккаунта")
       const { data, error } = await supabase
-        .from("character_features")
-        .insert([{ ...feature, character_id: account.id }])
+        .from("character_inventory")
+        .insert([{ ...item, character_id: account.id }])
         .select()
         .single()
       if (error) throw error
       return data
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["character_features", account?.id] })
+      queryClient.invalidateQueries({ queryKey: ["character_inventory", account?.id] })
     },
   })
 
   const updateMutation = useMutation({
-    mutationFn: async (feature: Partial<CharacterFeature> & { id: number }) => {
+    mutationFn: async (item: Partial<CharacterInventory> & { id: number }) => {
       const { data, error } = await supabase
-        .from("character_features")
-        .update(feature)
-        .eq("id", feature.id)
+        .from("character_inventory")
+        .update(item)
+        .eq("id", item.id)
         .select()
         .single()
       if (error) throw error
       return data
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["character_features", account?.id] })
+      queryClient.invalidateQueries({ queryKey: ["character_inventory", account?.id] })
     },
   })
 
   const deleteMutation = useMutation({
     mutationFn: async (id: number) => {
-      const { error } = await supabase.from("character_features").delete().eq("id", id)
+      const { error } = await supabase.from("character_inventory").delete().eq("id", id)
       if (error) throw error
       return id
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["character_features", account?.id] })
+      queryClient.invalidateQueries({ queryKey: ["character_inventory", account?.id] })
     },
   })
 
   // ---- функции управления ----
   const startAddItem = () =>
-    setNewItem({
-      name: "",
-      description: "",
-      level_required: 0,
-    })
-
+    setNewItem({ item_name: "", quantity: null, description: "", gold: null })
   const cancelAddItem = () => setNewItem(null)
 
   const saveNewItem = async () => {
     if (!newItem) return
-    await createMutation.mutateAsync(newItem as Omit<CharacterFeature, "id" | "character_id">)
+    await createMutation.mutateAsync(newItem as Omit<CharacterInventory, "id" | "character_id">)
     setNewItem(null)
   }
 
   const startEditItem = (id: number) => setEditingId(id)
   const cancelEditItem = () => setEditingId(null)
 
-  const saveEditItem = async (id: number, updated: Partial<CharacterFeature>) => {
+  const saveEditItem = async (id: number, updated: Partial<CharacterInventory>) => {
     await updateMutation.mutateAsync({ id, ...updated })
     setEditingId(null)
   }
@@ -108,24 +104,21 @@ export const useCharacterFeatures = () => {
     setEditingId(null)
   }
 
-  const toggleLevelFilter = (level: number | null) => setSelectedLevel(level)
+  const toggleSortOrder = () =>
+    setSortOrder((prev) => (prev === "asc" ? "desc" : "asc"))
 
-  // ---- уровни ----
-  const levelsFromFeatures = Array.from(new Set(features.map(f => f.level_required ?? 0)))
-  const availableLevels = [null, ...levelsFromFeatures.sort((a, b) => a - b)] // null = "Все"
-
-  // ---- фильтрация ----
-  const filteredList = features
-    .filter(f => (selectedLevel === null ? true : f.level_required === selectedLevel))
-    .sort((a, b) => (a.level_required ?? 0) - (b.level_required ?? 0))
+  const sortedList = [...inventory].sort((a, b) => {
+    const goldA = a.gold ?? 0
+    const goldB = b.gold ?? 0
+    return sortOrder === "asc" ? goldA - goldB : goldB - goldA
+  })
 
   return {
     isLoading,
-    list: filteredList,
+    localList: sortedList,
     newItem,
     editingId,
-    selectedLevel,
-    availableLevels,
+    sortOrder,
 
     // методы
     setNewItem,
@@ -136,6 +129,6 @@ export const useCharacterFeatures = () => {
     cancelEditItem,
     saveEditItem,
     deleteItem,
-    toggleLevelFilter,
+    toggleSortOrder,
   }
 }

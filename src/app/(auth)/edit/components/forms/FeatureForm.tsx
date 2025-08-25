@@ -1,13 +1,15 @@
+'use client'
+
 import Input from '@/ui/Input'
 import Select from '@/ui/Select'
 import ActionButton from '@/ui/ActionButton'
 import { type CharacterFeature } from '@/queries/characterFeaturesQueries'
 
-const levelOptions = ['0','1','2','3','4','5','6','7','8','9']
+const levelOptions = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9']
 
 interface FeatureFormProps {
   feature: Partial<CharacterFeature>
-  onChange: (feature: Partial<CharacterFeature>) => void
+  onChange: (field: keyof CharacterFeature, value: any) => void
   onSave: () => void
   onCancel: () => void
   onDelete?: () => void
@@ -20,18 +22,18 @@ const FeatureForm = ({ feature, onChange, onSave, onCancel, onDelete, isNew }: F
       <Input
         label="Название"
         value={feature.name || ''}
-        onChange={e => onChange({ ...feature, name: e.target.value })}
+        onChange={e => onChange('name', e.target.value)}
       />
       <Select
         label="Уровень"
-        value={String(feature.level_required || 0)}
+        value={String(feature.level_required ?? 0)}
         options={levelOptions}
-        onChange={val => onChange({ ...feature, level_required: Number(val) })}
+        onChange={val => onChange('level_required', Number(val))}
       />
       <Input
         label="Описание"
         value={feature.description || ''}
-        onChange={e => onChange({ ...feature, description: e.target.value })}
+        onChange={e => onChange('description', e.target.value)}
       />
 
       <div className="flex gap-2">

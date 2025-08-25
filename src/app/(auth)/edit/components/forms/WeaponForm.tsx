@@ -1,58 +1,49 @@
+'use client'
+
 import Input from '@/ui/Input'
 import Select from '@/ui/Select'
 import Checkbox from '@/ui/Checkbox'
 import ActionButton from '@/ui/ActionButton'
 import { type CharacterWeapon } from '@/queries/characterWeaponsQueries'
 
+const statOptions = ['str', 'dex', 'con', 'int', 'wis', 'cha']
+const diceOptions = ['d4', 'd6', 'd8', 'd10', 'd12']
+
 interface WeaponFormProps {
-  weapon: CharacterWeapon | Omit<CharacterWeapon, 'id' | 'character_id' | 'attack_bonus' | 'damage'>
-  statOptions: string[]
-  diceOptions: string[]
-  onChange: (w: any) => void
+  weapon: Partial<CharacterWeapon>
+  onChange: (field: keyof CharacterWeapon, value: any) => void
   onSave: () => void
   onCancel: () => void
   onDelete?: () => void
   isNew?: boolean
 }
 
-const WeaponForm = ({
-  weapon,
-  statOptions,
-  diceOptions,
-  onChange,
-  onSave,
-  onCancel,
-  onDelete,
-  isNew = false,
-}: WeaponFormProps) => {
+const WeaponForm = ({ weapon, onChange, onSave, onCancel, onDelete, isNew }: WeaponFormProps) => {
   return (
-    <div className="flex flex-col gap-2 ">
+    <div className="flex flex-col gap-2">
       <Input
         label="Название"
-        value={weapon.name}
-        onChange={e => onChange({ ...weapon, name: e.target.value })}
+        value={weapon.name || ''}
+        onChange={e => onChange('name', e.target.value)}
       />
       <Select
         label="Кубик"
-        value={weapon.damage_dice}
+        value={weapon.damage_dice || ''}
         options={diceOptions}
-        onChange={val => onChange({ ...weapon, damage_dice: val })}
+        onChange={val => onChange('damage_dice', val)}
       />
       <Select
         label="Аттрибут"
-        value={weapon.damage_stat}
+        value={weapon.damage_stat || ''}
         options={statOptions}
-        onChange={val => onChange({ ...weapon, damage_stat: val })}
+        onChange={val => onChange('damage_stat', val)}
       />
       <Input
         label="Доп. урон"
         type="number"
         value={weapon.extra_damage ?? ''}
         onChange={e =>
-          onChange({
-            ...weapon,
-            extra_damage: e.target.value === '' ? null : Number(e.target.value),
-          })
+          onChange('extra_damage', e.target.value === '' ? null : Number(e.target.value))
         }
       />
       <Input
@@ -60,16 +51,13 @@ const WeaponForm = ({
         type="number"
         value={weapon.extra_attack ?? ''}
         onChange={e =>
-          onChange({
-            ...weapon,
-            extra_attack: e.target.value === '' ? null : Number(e.target.value),
-          })
+          onChange('extra_attack', e.target.value === '' ? null : Number(e.target.value))
         }
       />
 
       <Checkbox
-        checked={weapon.use_proficiency}
-        onChange={val => onChange({ ...weapon, use_proficiency: val })}
+        checked={weapon.use_proficiency || false}
+        onChange={val => onChange('use_proficiency', val)}
         label="Бонус мастерства"
       />
 
