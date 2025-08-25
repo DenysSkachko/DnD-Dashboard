@@ -34,8 +34,7 @@ const SpellCard = ({
   const [openDesc, setOpenDesc] = useState(false)
   const [openBox, setOpenBox] = useState<string | null>(null)
   const cardRef = useRef<HTMLDivElement>(null)
-
-  // закрытие openBox при клике вне карточки
+  
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
       if (cardRef.current && !cardRef.current.contains(e.target as Node)) {
@@ -62,7 +61,6 @@ const SpellCard = ({
   ]
 
   const handleCardClick = (e: React.MouseEvent) => {
-    // если клик не на параметре, открываем описание и закрываем openBox
     if (!(e.target as HTMLElement).closest('[data-param]')) {
       setOpenDesc(prev => !prev)
       setOpenBox(null)
@@ -75,7 +73,7 @@ const SpellCard = ({
       className="flex flex-col bg-dark-hover rounded-lg p-4 relative w-full cursor-pointer hover:shadow-lg transition-shadow duration-200"
       onClick={handleCardClick}
     >
-      {/* Header */}
+
       <div className="flex justify-between items-center mb-2">
         {name && (
           <h3 className="text-lg font-bold text-gray-100 flex items-center gap-4">
@@ -100,7 +98,6 @@ const SpellCard = ({
 
       <div className="border-t border-dark my-2" />
 
-      {/* Параметры */}
       <div className="flex flex-wrap gap-2 text-[11px] mt-1 relative">
         {params.map(param => (
           <div key={param.key} className="relative flex flex-col items-start">
@@ -116,7 +113,6 @@ const SpellCard = ({
               <span>{param.value}</span>
             </div>
 
-            {/* OpenBox по центру */}
             {openBox === param.key && (
               <div className="absolute top-full left-1/2 mt-1 -translate-x-1/2 flex bg-dark border border-alt rounded-md p-2 text-center text-[10px] text-text-alt shadow-md z-10">
                 {param.label}
@@ -126,7 +122,6 @@ const SpellCard = ({
         ))}
       </div>
 
-      {/* Description */}
       {description && (
         <div
           className={`mt-3 text-gray-300 text-sm overflow-hidden transition-all duration-300 ${

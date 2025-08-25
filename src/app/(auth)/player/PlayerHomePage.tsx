@@ -13,11 +13,12 @@ import PlayerCombat from './components/PlayerCombat'
 import PlayerStats from './components/PlayerStats'
 import PlayerSkills from './components/PlayerSkills'
 import { Loader } from '@/ui/Loader'
+import { motion } from 'framer-motion'
 
 export default function PlayerHomePage() {
   const { account, hydrated } = useAccount()
 
-  if (!hydrated) return <p>Loading account...</p>
+  if (!hydrated) return <Loader />
   if (!account) return <p>No account found</p>
 
   const { data: character, isLoading: charLoading, error: charError } = useCharacter()
@@ -27,9 +28,7 @@ export default function PlayerHomePage() {
   const { data: savingThrows, isLoading: savingLoading } = useCharacterSavingThrows()
 
   if (charLoading || statsLoading || combatLoading || skillsLoading || savingLoading) {
-    return (
-      <Loader />
-    )
+    return <Loader />
   }
 
   if (charError) {
@@ -74,13 +73,42 @@ export default function PlayerHomePage() {
     proficiency_bonus: stats.proficiency_bonus ?? undefined,
   }
 
+  const containerVariants = {
+    hidden: {},
+    visible: {
+      transition: {
+        staggerChildren: 0.15,
+      },
+    },
+  }
+
+  const itemVariants = {
+    hidden: { opacity: 0, x: 100 },
+    visible: { opacity: 1, x: 0, transition: { duration: 0.4 } },
+  }
+
   return (
-    <div className="relative w-full max-w-md mx-auto overflow-hidden">
-      <PlayerMain character={character} />
-      <PlayerHP combat={safeCombat} />
-      <PlayerCombat combat={safeCombat} />
-      <PlayerStats stats={safeStats} savingThrows={savingThrows ?? null} />
-      <PlayerSkills stats={safeStats} skills={skills} />
-    </div>
+    <motion.div
+      className="relative w-full max-w-md mx-auto overflow-hidden flex flex-col"
+      variants={containerVariants}
+      initial="hidden"
+      animate="visible"
+    >
+      <motion.div variants={itemVariants}>
+        <PlayerMain character={character} />
+      </motion.div>
+      <motion.div variants={itemVariants}>
+        <PlayerHP combat={safeCombat} />
+      </motion.div>
+      <motion.div variants={itemVariants}>
+        <PlayerCombat combat={safeCombat} />
+      </motion.div>
+      <motion.div variants={itemVariants}>
+        <PlayerStats stats={safeStats} savingThrows={savingThrows ?? null} />
+      </motion.div>
+      <motion.div variants={itemVariants}>
+        <PlayerSkills stats={safeStats} skills={skills} />
+      </motion.div>
+    </motion.div>
   )
 }

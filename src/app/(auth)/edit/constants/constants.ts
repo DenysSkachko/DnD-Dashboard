@@ -1,4 +1,3 @@
-// somewhere in utils/constants.ts
 export const statLabels: Record<string, string> = {
   strength: 'Сила',
   dexterity: 'Ловкость',

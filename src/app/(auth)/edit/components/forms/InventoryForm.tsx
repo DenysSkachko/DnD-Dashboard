@@ -28,7 +28,7 @@ const InventoryForm = ({ item, onChange, onSave, onCancel, onDelete }: Props) =>
       />
       <Input
         type="number"
-        label="Стоимость (Gold)"
+        label="Стоимость"
         value={item.gold ?? ''}
         onChange={(e) =>
           onChange('gold', e.target.value === '' ? null : Number(e.target.value))

@@ -25,7 +25,7 @@ export default function PlayerCombat({ combat }: PlayerCombatProps) {
       inspiration: !combat.inspiration,
     })
   }
-  
+
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
       if (containerRef.current && !containerRef.current.contains(e.target as Node)) {

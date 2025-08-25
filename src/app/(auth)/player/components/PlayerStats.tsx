@@ -17,7 +17,7 @@ type PlayerStatsProps = {
   savingThrows: CharacterSavingThrow | null
 }
 
-const ATTRIBUTES = [
+const statsList = [
   { key: 'strength', label: 'Сила', icon: Sword },
   { key: 'dexterity', label: 'Ловкость', icon: Crosshair },
   { key: 'constitution', label: 'Телосложение', icon: Shield },
@@ -39,7 +39,7 @@ export default function PlayerStats({ stats, savingThrows }: PlayerStatsProps) {
   return (
     <>
       <div className="grid grid-cols-3 gap-4 px-5 pb-6">
-        {ATTRIBUTES.map(({ key, label, icon: Icon }) => {
+        {statsList.map(({ key, label, icon: Icon }) => {
           const statValue = (stats as any)[key] ?? 0
           const savingValue = computeSavingThrow(key)
           const isFlipped = flippedKey === key
@@ -47,16 +47,14 @@ export default function PlayerStats({ stats, savingThrows }: PlayerStatsProps) {
           return (
             <div
               key={key}
-              className="relative w-full cursor-pointer"
+              className="relative w-full cursor-pointer h-21"  
               onClick={() => setFlippedKey(isFlipped ? null : key)}
-              style={{ height: '84px' }} 
             >
               <div
                 className={`relative w-full h-full transition-transform duration-500 [transform-style:preserve-3d] ${
                   isFlipped ? 'rotate-y-180' : ''
                 }`}
               >
-
                 <div className="absolute inset-0 flex flex-col items-center justify-center rounded-lg bg-dark-hover border border-alt shadow-md backface-hidden p-2">
                   <div className="absolute -top-3 bg-dark border border-alt rounded-full p-1.5 shadow-md">
                     <Icon className="w-4 h-4 text-accent" />

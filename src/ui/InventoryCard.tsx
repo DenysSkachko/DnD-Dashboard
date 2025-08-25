@@ -14,24 +14,20 @@ const InventoryCard = ({ name, quantity = 1, gold = 0, description, onEdit }: Pr
       onClick={onEdit}
     >
       <div className="flex justify-between items-center w-full">
-        <span className="font-semibold text-lg text-white">
-          {name} {quantity > 0 && <span className="text-gray-300 text-sm">{quantity} шт.</span>}{' '}
+        <span className="font-semibold text-white">
+          {name} {quantity > 0 && <span className="text-text-alt text-[10px]">{quantity} шт.</span>}{' '}
         </span>
 
-        <div className="flex items-center ">
-          {gold > 0 && (
-            <p className="text-yellow-400 font-bold text-xl flex items-center gap-1">
-              {gold}{' '}
-              <span>
-                <FaCoins className="text-lg" />
-              </span>
-            </p>
-          )}
-        </div>
+        {gold > 0 && (
+          <div className="bg-yellow-500/10 text-yellow-400 px-3 py-1 rounded-lg flex items-center gap-1 font-bold text-sm shadow-inner">
+            {gold}
+            <FaCoins className="text-base" />
+          </div>
+        )}
       </div>
 
       {description && (
-        <div className=" flex gap-3 items-end text-text-alt text-sm relative">
+        <div className=" flex gap-3 items-end text-text-alt text-[10px] relative">
           <p className="pr-12 break-words max-w-70">{description}</p>
         </div>
       )}

@@ -41,10 +41,11 @@ const CharacterWeaponsSection = () => {
       damage_dice: '',
       damage_stat: '',
       extra_damage: null,
+      extra_attack: null,
       use_proficiency: false,
     },
     stripKeys: ['id', 'character_id'],
-    createFn: (item) =>
+    createFn: item =>
       createWeapon.mutateAsync(
         item as Omit<CharacterWeapon, 'id' | 'character_id' | 'attack_bonus' | 'damage'>
       ),
@@ -53,14 +54,14 @@ const CharacterWeaponsSection = () => {
         id,
         ...(item as Omit<CharacterWeapon, 'id' | 'character_id' | 'attack_bonus' | 'damage'>),
       }),
-    deleteFn: (id) => deleteWeapon.mutateAsync(id),
+    deleteFn: id => deleteWeapon.mutateAsync(id),
   })
 
   if (isLoading) return <Loader />
 
   const statOptions = stats
     ? Object.keys(stats).filter(
-        (k) => k !== 'id' && k !== 'character_id' && k !== 'proficiency_bonus'
+        k => k !== 'id' && k !== 'character_id' && k !== 'proficiency_bonus'
       )
     : []
 
@@ -73,7 +74,9 @@ const CharacterWeaponsSection = () => {
       w.extra_damage ? ` + ${w.extra_damage}` : ''
     }`
     const attackBonus =
-      statValue + (w.use_proficiency ? Number((stats as any).proficiency_bonus || 0) : 0)
+      statValue +
+      (w.use_proficiency ? Number((stats as any).proficiency_bonus || 0) : 0) +
+      (w.extra_attack ?? 0)
     return { damage: damageStr, attack_bonus: attackBonus }
   }
 
@@ -99,7 +102,7 @@ const CharacterWeaponsSection = () => {
           weapon={newItem}
           statOptions={statOptions}
           diceOptions={diceOptions}
-          onChange={(w) => setNewItem(w)}
+          onChange={w => setNewItem(w)}
           onSave={handleAddNew}
           onCancel={cancelAdd}
           isNew
@@ -124,7 +127,7 @@ const CharacterWeaponsSection = () => {
                   weapon={w}
                   statOptions={statOptions}
                   diceOptions={diceOptions}
-                  onChange={(newW) => {
+                  onChange={newW => {
                     const copy = [...localList]
                     copy[idx] = newW
                     setLocalList(copy)

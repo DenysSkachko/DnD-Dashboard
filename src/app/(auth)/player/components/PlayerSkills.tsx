@@ -1,24 +1,22 @@
-// src/ui/PlayerSkills.tsx
 import {
-  Dumbbell,      // Атлетика
-  Footprints,    // Акробатика
-  Hand,          // Ловкость рук
-  EyeOff,        // Скрытность
-  Landmark,      // История
-  Sparkles,      // Магия
-  Leaf,          // Природа
-  Search,        // Анализ
-  Church,        // Религия
-  Eye,           // Внимательность
-  Mountain,      // Выживание
-  Stethoscope,   // Медицина
-  Brain,         // Проницательность
-  PawPrint,      // Уход за животными
-  Music,         // Выступление
-  Skull,         // Запугивание
-  UserX,          // Обман
+  Dumbbell, // Атлетика
+  Footprints, // Акробатика
+  Hand, // Ловкость рук
+  EyeOff, // Скрытность
+  Landmark, // История
+  Sparkles, // Магия
+  Leaf, // Природа
+  Search, // Анализ
+  Church, // Религия
+  Eye, // Внимательность
+  Mountain, // Выживание
+  Stethoscope, // Медицина
+  Brain, // Проницательность
+  PawPrint, // Уход за животными
+  Music, // Выступление
+  Skull, // Запугивание
+  UserX, // Обман
   MessageCircle, // Убеждение
-  Star,          // Бонус мастерства
 } from 'lucide-react'
 import { type CharacterSkills } from '@/queries/characterSkillsQueries'
 
@@ -35,7 +33,7 @@ type PlayerSkillsProps = {
   skills: CharacterSkills | null
 }
 
-const skillList = [
+const skillsList = [
   { key: 'athletics', label: 'Атлетика', attr: 'strength', icon: Dumbbell },
   { key: 'acrobatics', label: 'Акробатика', attr: 'dexterity', icon: Footprints },
   { key: 'sleight_of_hand', label: 'Ловкость рук', attr: 'dexterity', icon: Hand },
@@ -54,7 +52,7 @@ const skillList = [
   { key: 'intimidation', label: 'Запугивание', attr: 'charisma', icon: Skull },
   { key: 'deception', label: 'Обман', attr: 'charisma', icon: UserX },
   { key: 'persuasion', label: 'Убеждение', attr: 'charisma', icon: MessageCircle },
-] as const
+]
 
 export default function PlayerSkills({ stats, skills }: PlayerSkillsProps) {
   const getValue = (key: string, attr: keyof typeof stats) => {
@@ -67,7 +65,7 @@ export default function PlayerSkills({ stats, skills }: PlayerSkillsProps) {
   return (
     <div className="px-5 pb-6">
       <div className="grid grid-cols-2 gap-3">
-        {skillList.map(({ key, label, attr, icon: Icon }) => (
+        {skillsList.map(({ key, label, attr, icon: Icon }) => (
           <div
             key={key}
             className="relative flex items-center gap-2 rounded-lg bg-alt border border-alt shadow-md px-3 py-2"

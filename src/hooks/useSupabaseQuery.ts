@@ -32,12 +32,11 @@ export function useSupabaseQuery<T, S extends boolean = false>({
   })
 }
 
-// --- универсальная мутация ---
 type MutationParams<T> = {
   key: (string | number)[]
   table: string
   type: 'insert' | 'update' | 'delete'
-  idKey?: string // можно указать другой ключ вместо "id"
+  idKey?: string
   onSuccess?: () => void
 }
 

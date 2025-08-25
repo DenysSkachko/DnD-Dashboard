@@ -9,32 +9,32 @@ import CharacterInventorySection from './components/CharacterInventorySections'
 import CharacterWeaponsSection from './components/CharacterWeaponsSection'
 import CharacterSpellsSection from './components/CharacterSpellsSection'
 import CharacterCombatSection from './components/CharacterCombatSection'
+import CharacterFeaturesSection from './components/CharacterFeaturesSection'
 
 const tabs = [
   { name: 'Персонаж', component: <CharacterSection /> },
   { name: 'Статы', component: <CharacterStatsSection /> },
   { name: 'Навыки', component: <CharacterSkillsSection /> },
-
   { name: 'Сражение', component: <CharacterCombatSection /> },
   { name: 'Инвентарь', component: <CharacterInventorySection /> },
   { name: 'Оружие', component: <CharacterWeaponsSection /> },
   { name: 'Заклинания', component: <CharacterSpellsSection /> },
-
   { name: 'Спасброски', component: <CharacterSavingThrowsSection /> },
+  { name: 'Особенности', component: <CharacterFeaturesSection/> },
 ]
 
-const HomePage = () => {
+const EditPage = () => {
   const [activeTab, setActiveTab] = useState(tabs[0].name)
 
   return (
     <div className="min-h-screen p-6">
-      {/* Табы */}
+  
       <div className="flex flex-wrap gap-2 mb-4 w-full">
         {tabs.map(tab => (
           <button
             key={tab.name}
             onClick={() => setActiveTab(tab.name)}
-            className={`flex-1 min-w-[30%] px-4 py-2 rounded-md font-medium transition-colors text-center  text-sm
+            className={`flex-1 min-w-[30%] px-3 py-2 rounded-md font-medium transition-colors text-center  text-xs
               ${
                 activeTab === tab.name
                   ? 'bg-white text-black'
@@ -46,7 +46,6 @@ const HomePage = () => {
         ))}
       </div>
 
-      {/* Контент активной вкладки */}
       <div>
         {tabs.map(
           tab =>
@@ -61,4 +60,4 @@ const HomePage = () => {
   )
 }
 
-export default HomePage
+export default EditPage

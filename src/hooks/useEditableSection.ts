@@ -22,7 +22,6 @@ export function useEditableSection<T>({
 }: UseEditableSectionProps<T>) {
   const isList = Array.isArray(data)
 
-  // 🔥 фикс: strip теперь useCallback, не пересоздаётся каждый рендер
   const strip = useCallback(
     (obj: any) => {
       if (!obj) return null
@@ -32,7 +31,7 @@ export function useEditableSection<T>({
       }
       return copy
     },
-    [stripKeys.join(',')] // либо [] если stripKeys всегда одинаков
+    [stripKeys.join(',')] 
   )
 
   // --- single ---
@@ -45,7 +44,6 @@ export function useEditableSection<T>({
   const [newItem, setNewItem] = useState<any | null>(null)
   const originalListRef = useRef<T[]>([])
 
-  // 🔥 фикс: зависимость только [data], strip стабилен
   useEffect(() => {
     if (Array.isArray(data)) {
       originalListRef.current = data

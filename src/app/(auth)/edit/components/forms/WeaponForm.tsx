@@ -55,6 +55,18 @@ const WeaponForm = ({
           })
         }
       />
+      <Input
+        label="Доп. бонус к атаке"
+        type="number"
+        value={weapon.extra_attack ?? ''}
+        onChange={e =>
+          onChange({
+            ...weapon,
+            extra_attack: e.target.value === '' ? null : Number(e.target.value),
+          })
+        }
+      />
+
       <Checkbox
         checked={weapon.use_proficiency}
         onChange={val => onChange({ ...weapon, use_proficiency: val })}
