@@ -49,8 +49,8 @@ const CharacterCombatSection = () => {
     })
 
   return (
-    <div className="flex flex-col gap-3">
-      <div className="flex justify-between items-center">
+    <>
+      <div className="flex-center">
         <FormTitle>Сражение</FormTitle>
         {editMode ? (
           <div className="flex gap-2">
@@ -65,7 +65,7 @@ const CharacterCombatSection = () => {
       {isLoading ? (
         <Loader />
       ) : editMode ? (
-        <div className="flex flex-col gap-3 max-w-sm">
+        <div className="flex flex-col gap-2">
           {FIELDS.map(f => (
             <Input
               key={f}
@@ -94,7 +94,7 @@ const CharacterCombatSection = () => {
           </SectionItem>
         </div>
       )}
-    </div>
+    </>
   )
 }
 

@@ -89,8 +89,8 @@ const CharacterWeaponsSection = () => {
   }
 
   return (
-    <div className="flex flex-col gap-3">
-      <div className="flex justify-between items-center">
+    <>
+      <div className="flex-center">
         <FormTitle>Оружие</FormTitle>
         <ActionButton type="add" onClick={startAddItem} />
       </div>
@@ -131,7 +131,7 @@ const CharacterWeaponsSection = () => {
           )
         })}
       </ul>
-    </div>
+    </>
   )
 }
 

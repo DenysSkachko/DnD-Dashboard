@@ -63,11 +63,11 @@ const CharacterSavingThrowsSection = () => {
   }
 
   return (
-    <div className="flex flex-col gap-3">
-      <div className="flex justify-between items-center">
+    <>
+      <div className="flex-center">
         <FormTitle>Спасброски</FormTitle>
         {editMode ? (
-          <div className="flex gap-2 mt-2">
+          <div className="flex gap-2">
             <ActionButton type="save" onClick={saveSingle} />
             <ActionButton type="cancel" onClick={cancelSingle} />
           </div>
@@ -88,7 +88,7 @@ const CharacterSavingThrowsSection = () => {
           )}
         </SectionItem>
       ))}
-    </div>
+    </>
   )
 }
 

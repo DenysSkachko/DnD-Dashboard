@@ -21,6 +21,12 @@ body {
   font-family: var(--font-inter);
 }
 
+.flex-center {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
 ::-webkit-scrollbar {
   display: none;
 }

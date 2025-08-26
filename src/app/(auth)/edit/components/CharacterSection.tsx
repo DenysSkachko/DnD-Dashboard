@@ -50,8 +50,8 @@ const CharacterSection = () => {
   if (isLoading) return <Loader />
 
   return (
-    <div className="flex flex-col gap-3 rounded-md">
-      <div className="flex justify-between items-center">
+    <>
+      <div className="flex-center">
         <FormTitle>Персонаж</FormTitle>
         {editMode ? (
           <div className="flex gap-2">
@@ -64,7 +64,7 @@ const CharacterSection = () => {
       </div>
 
       {editMode && localItem ? (
-        <div className="flex flex-col gap-4">
+        <div className="flex flex-col gap-2">
           {FIELDS.map((field) => (
             <Input
               key={field}
@@ -82,9 +82,9 @@ const CharacterSection = () => {
           <SectionItem title="Класс:">{character.class}</SectionItem>
         </>
       ) : (
-        <p className="text-gray-400 italic">Персонаж ещё не создан</p>
+        <p className="text-text-alt">Персонаж ещё не создан</p>
       )}
-    </div>
+    </>
   )
 }
 

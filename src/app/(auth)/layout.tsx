@@ -16,7 +16,7 @@ export default function HomeLayout({ children }: { children: React.ReactNode }) 
   }, [hydrated, account, router])
 
   return (
-    <div className="min-h-screen w-full flex flex-col text-light">
+    <div className="min-h-screen flex flex-col text-light">
       <Header />
       <main className="flex-1">{children}</main>
     </div>

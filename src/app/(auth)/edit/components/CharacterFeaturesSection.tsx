@@ -54,14 +54,14 @@ const CharacterFeaturesSection = () => {
   if (isLoading) return <Loader />
 
   return (
-    <div className="flex flex-col gap-3">
-      <div className="flex justify-between items-center">
+    <>
+      <div className="flex-center">
         <FormTitle>Особенности</FormTitle>
         <ActionButton type="add" onClick={startAddItem} />
       </div>
 
       {/* фильтр по уровню */}
-      <div className="flex flex-wrap gap-2 mb-2">
+      <div className="flex flex-wrap gap-2">
         {availableLevels.map(level => (
           <button
             key={level === null ? 'all' : level}
@@ -109,7 +109,7 @@ const CharacterFeaturesSection = () => {
           )
         })}
       </ul>
-    </div>
+    </>
   )
 }
 
