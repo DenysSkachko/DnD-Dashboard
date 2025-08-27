@@ -1,8 +1,10 @@
 import React, { useState, useRef, useEffect } from "react";
 
+type Option = { value: string; label: string };
+
 type SelectProps = {
   value: string;
-  options: string[];
+  options: (string | Option)[]; // теперь можно и строки, и объекты
   onChange: (value: string) => void;
   label?: string;
   className?: string;
@@ -22,12 +24,18 @@ const Select: React.FC<SelectProps> = ({ value, options, onChange, label, classN
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
+  const getLabel = (val: string) => {
+    const opt = options.find(
+      o => (typeof o === "string" ? o === val : o.value === val)
+    );
+    if (!opt) return val;
+    return typeof opt === "string" ? opt : opt.label;
+  };
+
   return (
     <div className={`relative w-full ${className}`} ref={ref}>
       {label && (
-        <label
-          className="absolute -top-2 right-1 bg-accent rounded-md px-3 text-sm font-medium text-light z-30"
-        >
+        <label className="absolute -top-2 right-1 bg-accent rounded-md px-3 text-sm font-medium text-light z-30">
           {label}
         </label>
       )}
@@ -37,7 +45,7 @@ const Select: React.FC<SelectProps> = ({ value, options, onChange, label, classN
         onClick={() => setIsOpen(!isOpen)}
         className="w-full relative bg-dark-hover rounded-md font-bold px-5 py-3 text-xl focus:outline-none focus:border-accent"
       >
-        <span>{value || "Select..."}</span>
+        <span>{value ? getLabel(value) : "Select..."}</span>
         <svg
           className={`absolute top-1/2 -translate-y-1/2 w-5 h-5 transition-transform ${isOpen ? "rotate-180" : ""}`}
           fill="none"
@@ -51,18 +59,22 @@ const Select: React.FC<SelectProps> = ({ value, options, onChange, label, classN
 
       {isOpen && (
         <ul className="absolute z-50 mt-1 w-full bg-dark border border-gray-600 rounded-lg max-h-60 overflow-auto shadow-lg">
-          {options.map((opt) => (
-            <li
-              key={opt}
-              onClick={() => {
-                onChange(opt);
-                setIsOpen(false);
-              }}
-              className="px-4 py-3 cursor-pointer hover:bg-accent-hover transition-colors"
-            >
-              {opt}
-            </li>
-          ))}
+          {options.map(opt => {
+            const val = typeof opt === "string" ? opt : opt.value;
+            const labelText = typeof opt === "string" ? opt : opt.label;
+            return (
+              <li
+                key={val}
+                onClick={() => {
+                  onChange(val);
+                  setIsOpen(false);
+                }}
+                className="px-4 py-3 cursor-pointer hover:bg-accent-hover transition-colors"
+              >
+                {labelText}
+              </li>
+            );
+          })}
         </ul>
       )}
     </div>

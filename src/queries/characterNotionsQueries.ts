@@ -1,83 +1,75 @@
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { supabase } from "@/lib/supabaseClient";
-import { useAccount } from "@/context/AccountContext";
+// src/queries/characterNotions.ts
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
+import { supabase } from "@/lib/supabaseClient"
 
 export type CharacterNotion = {
-  id: number;
-  character_id: number;
-  name: string;
-  content?: string;
-};
+  id: number
+  character_id: number
+  name: string
+  content: string
+}
 
-export const useCharacterNotions = () => {
-  const { account } = useAccount();
-  return useQuery({
-    queryKey: ["character_notions", account?.id],
-    queryFn: async (): Promise<CharacterNotion[]> => {
-      if (!account) throw new Error("Нет аккаунта");
+export const useCharacterNotions = (characterId: number) =>
+  useQuery({
+    queryKey: ["character_notions", characterId],
+    queryFn: async () => {
       const { data, error } = await supabase
         .from("character_notions")
         .select("*")
-        .eq("character_id", account.id);
-      if (error) throw error;
-      return data;
+        .eq("character_id", characterId)
+        .order("id")
+      if (error) throw error
+      return data as CharacterNotion[]
     },
-    enabled: !!account,
-  });
-};
+  })
 
 export const useCreateCharacterNotion = () => {
-  const { account } = useAccount();
-  const queryClient = useQueryClient();
+  const queryClient = useQueryClient()
   return useMutation({
-    mutationFn: async (newNotion: Omit<CharacterNotion, "id" | "character_id">) => {
-      if (!account) throw new Error("Нет аккаунта");
+    mutationFn: async (notion: Omit<CharacterNotion, "id">) => {
       const { data, error } = await supabase
         .from("character_notions")
-        .insert([{ ...newNotion, character_id: account.id }])
-        .select();
-      if (error) throw error;
-      return data;
+        .insert([notion])
+        .select()
+        .single()
+      if (error) throw error
+      return data as CharacterNotion
     },
-    onSuccess: () =>
-      queryClient.invalidateQueries({ queryKey: ["character_notions", account?.id] }),
-  });
-};
+    onSuccess: (data) => {
+      queryClient.invalidateQueries({ queryKey: ["character_notions", data.character_id] })
+    },
+  })
+}
 
 export const useUpdateCharacterNotion = () => {
-  const { account } = useAccount();
-  const queryClient = useQueryClient();
+  const queryClient = useQueryClient()
   return useMutation({
-    mutationFn: async (updatedNotion: Partial<CharacterNotion> & { id: number }) => {
-      if (!account) throw new Error("Нет аккаунта");
+    mutationFn: async (notion: Pick<CharacterNotion, "id"> & Partial<CharacterNotion>) => {
       const { data, error } = await supabase
         .from("character_notions")
-        .update(updatedNotion)
-        .eq("id", updatedNotion.id)
-        .select();
-      if (error) throw error;
-      return data;
+        .update(notion)
+        .eq("id", notion.id)
+        .select()
+        .single()
+      if (error) throw error
+      return data as CharacterNotion
     },
-    onSuccess: () =>
-      queryClient.invalidateQueries({ queryKey: ["character_notions", account?.id] }),
-  });
-};
+    onSuccess: (data) => {
+      queryClient.invalidateQueries({ queryKey: ["character_notions", data.character_id] })
+    },
+  })
+}
 
 export const useDeleteCharacterNotion = () => {
-  const { account } = useAccount();
-  const queryClient = useQueryClient();
+  const queryClient = useQueryClient()
   return useMutation({
-    mutationFn: async (id: number) => {
-      if (!account) throw new Error("Нет аккаунта");
-      const { data, error } = await supabase
-        .from("character_notions")
-        .delete()
-        .eq("id", id)
-        .select();
-      if (error) throw error;
-      return data;
+    mutationFn: async ({ id, character_id }: { id: number; character_id: number }) => {
+      const { error } = await supabase.from("character_notions").delete().eq("id", id)
+      if (error) throw error
+      return { id, character_id }
     },
-    onSuccess: () =>
-      queryClient.invalidateQueries({ queryKey: ["character_notions", account?.id] }),
-  });
-};
+    onSuccess: ({ character_id }) => {
+      queryClient.invalidateQueries({ queryKey: ["character_notions", character_id] })
+    },
+  })
+}

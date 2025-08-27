@@ -12,7 +12,7 @@ const InventoryPage = () => {
 
   return (
     <div className="flex flex-col gap-3 p-6">
-      <div className="flex gap-4">
+      <div className="flex w-full gap-4">
         <button
           className={`flex-1 h-11 bg-dark-hover flex justify-center items-center rounded-md text-3xl font-bold uppercase ${
             tab === 'inventory' ? 'text-accent' : 'text-white'

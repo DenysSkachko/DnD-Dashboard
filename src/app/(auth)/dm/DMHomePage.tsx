@@ -25,7 +25,7 @@ export default function DMHomePage() {
 
   return (
     <div className="space-y-4 bg-accent-hover">
-      <h2 className="text-2xl font-bold">Welcome to Home Page 🎉</h2>
+      {/* <h2 className="text-2xl font-bold">Welcome to Home Page 🎉</h2>
       <p>This is the main dashboard after login.</p>
 
       <h3 className="text-xl font-semibold">Characters:</h3>
@@ -39,7 +39,8 @@ export default function DMHomePage() {
         </ul>
       ) : (
         <p>No characters found.</p>
-      )}
+      )} */}
+      Привет, эта страничка еще не готова
     </div>
   )
 }

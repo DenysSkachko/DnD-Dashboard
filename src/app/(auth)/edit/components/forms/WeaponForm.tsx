@@ -6,7 +6,15 @@ import Checkbox from '@/ui/Checkbox'
 import ActionButton from '@/ui/ActionButton'
 import { type CharacterWeapon } from '@/queries/characterWeaponsQueries'
 
-const statOptions = ['str', 'dex', 'con', 'int', 'wis', 'cha']
+const statOptions = [
+  { value: 'strength', label: 'Сила' },
+  { value: 'dexterity', label: 'Ловкость' },
+  { value: 'constitution', label: 'Телосложение' },
+  { value: 'intelligence', label: 'Интеллект' },
+  { value: 'wisdom', label: 'Мудрость' },
+  { value: 'charisma', label: 'Харизма' },
+]
+
 const diceOptions = ['d4', 'd6', 'd8', 'd10', 'd12']
 
 interface WeaponFormProps {
