@@ -27,7 +27,7 @@ const EditPage = () => {
   const [activeTab, setActiveTab] = useState(tabs[0].name)
 
   return (
-    <div className="min-h-screen p-6 max-w-sm">
+    <div className="min-h-screen p-6">
   
       <div className="flex flex-wrap gap-2 mb-4 w-full">
         {tabs.map(tab => (
