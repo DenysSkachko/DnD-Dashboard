@@ -89,7 +89,7 @@ export default function PlayerHomePage() {
 
   return (
     <motion.div
-      className="relative w-full max-w-md mx-auto overflow-hidden flex flex-col"
+      className="relative w-full mx-auto overflow-hidden flex flex-col"
       variants={containerVariants}
       initial="hidden"
       animate="visible"
