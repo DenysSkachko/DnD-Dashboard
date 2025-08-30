@@ -31,7 +31,7 @@ export default function DMFooter({ enemies, onEnemyClick }: Props) {
             rounded-2xl border border-red-600/30
             shadow-[0_0_15px_rgba(255,0,0,0.5)]
             hover:shadow-[0_0_25px_rgba(255,50,50,0.7)]
-            transition-all duration-300 cursor-pointer hover:scale-125"
+            transition-all duration-300 cursor-pointer hover:scale-105"
         >
           {enemy.name}
         </button>

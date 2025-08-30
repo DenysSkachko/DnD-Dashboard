@@ -197,7 +197,7 @@ export default function CombatPage() {
         initiativeBonus={initiativeBonus}
       />
 
-      <div className="pb-16 p-4">
+      <div className="pb-16 p-4 ">
         {!activeFight ? (
           <div className="text-center">
             <p>Нет активного боя</p>
@@ -210,13 +210,13 @@ export default function CombatPage() {
                 <ActionButton type="edit" onClick={() => setShowInitiativeModal(true)} />
               </div>
             ) : (
-              <div className="flex gap-2 mb-4 justify-start">
+              <div className="flex gap-2 mb-4 justify-center">
                 <ActionButton type="delete" onClick={() => finishFight.mutate()} />
                 <ActionButton type="add" onClick={openAddEnemyForm} />
               </div>
             )}
 
-            <ul className="space-y-2">
+            <ul className="flex flex-col gap-2 mx-auto w-fit">
               {participants.map(p => (
                 <li key={p.id}>
                   <ParticipantItem
