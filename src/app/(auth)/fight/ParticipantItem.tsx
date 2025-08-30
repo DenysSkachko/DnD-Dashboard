@@ -2,6 +2,7 @@
 import React from 'react'
 import { Shield, HeartPulse, Zap } from 'lucide-react'
 import ActionButton from '@/ui/ActionButtonFight'
+import { TemplateContext } from 'next/dist/shared/lib/app-router-context.shared-runtime'
 
 interface Props {
   participant: any
@@ -39,20 +40,30 @@ export default function ParticipantItem({ participant, isDM, onEditEnemy, onDele
         {/* HP + AC */}
         {!p.is_enemy || isDM ? (
           <div className="flex justify-between items-center gap-4 mt-3 w-full">
-            <div className="flex items-center gap-2 text-red-500 font-bold text-2xl 
-              drop-shadow-[0_0_8px_rgba(239,68,68,0.8)] animate-pulse-fast">
+            <div
+              className="flex items-center gap-2 text-red-500 font-bold text-2xl 
+              drop-shadow-[0_0_8px_rgba(239,68,68,0.8)] animate-pulse-fast"
+            >
               <HeartPulse className="w-6 h-6" />
               <span>
                 {p.current_hp}/{p.max_hp}
               </span>
+
+              {p?.temp_hp > 0 && (
+                <span className="text-yellow-300 font-bold ml-1">( {p.temp_hp} )</span>
+              )}
             </div>
-            <div className="flex items-center gap-2 text-blue-400 font-bold 
-              drop-shadow-[0_0_8px_rgba(96,165,250,0.8)]">
+            <div
+              className="flex items-center gap-2 text-blue-400 font-bold 
+              drop-shadow-[0_0_8px_rgba(96,165,250,0.8)]"
+            >
               <Shield className="w-6 h-6" />
               <span className="text-xl">{p.armor_class}</span>
             </div>
           </div>
-        ) : ('')}
+        ) : (
+          ''
+        )}
       </div>
 
       {/* Кнопки управления для ДМа */}

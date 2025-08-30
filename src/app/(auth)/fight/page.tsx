@@ -233,10 +233,15 @@ export default function CombatPage() {
       </div>
 
       {/* --- Footer игрока --- */}
-      {activeFight && myParticipant && !isDM && (
+      {activeFight && myParticipant && (
         <PlayerFooter
           myParticipant={myParticipant}
-          onSave={(v: number | '') => updateHp.mutate(normalizeNumber(v))}
+          onSave={({ hp, temp }) =>
+            updateHp.mutate({
+              newHp: normalizeNumber(hp),
+              newTempHp: normalizeNumber(temp),
+            })
+          }
         />
       )}
 

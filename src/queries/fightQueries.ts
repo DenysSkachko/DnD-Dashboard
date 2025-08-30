@@ -206,12 +206,13 @@ export const useJoinFight = (fightId?: number) => {
   })
 }
 // ===== Изменение своих HP (игрок) =====
+// ===== Изменение своих HP и Temp HP (игрок) =====
 export const useUpdateHP = (fightId?: number) => {
   const queryClient = useQueryClient()
   const { account } = useAccount()
 
   return useMutation({
-    mutationFn: async (newHp: number) => {
+    mutationFn: async ({ newHp, newTempHp }: { newHp: number; newTempHp: number }) => {
       if (!fightId || !account) throw new Error('Нет боя или аккаунта')
 
       // --- находим участника боя ---
@@ -224,10 +225,10 @@ export const useUpdateHP = (fightId?: number) => {
 
       if (!participant) throw new Error('Не найден участник боя')
 
-      // --- обновляем HP в fight_participants ---
+      // --- обновляем HP и Temp HP в fight_participants ---
       await supabase
         .from('fight_participants')
-        .update({ current_hp: newHp })
+        .update({ current_hp: newHp, temp_hp: newTempHp })
         .eq('id', participant.id)
 
       // --- находим персонажа игрока ---
@@ -239,7 +240,7 @@ export const useUpdateHP = (fightId?: number) => {
 
       if (!character) throw new Error('Не найден персонаж у аккаунта')
 
-      // --- обновляем HP в character_combat ---
+      // --- обновляем HP в character_combat (temp_hp там нет) ---
       await supabase
         .from('character_combat')
         .update({ current_hp: newHp })
