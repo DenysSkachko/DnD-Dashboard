@@ -1,6 +1,7 @@
 'use client'
 
 import { useSupabaseQuery } from '@/hooks/useSupabaseQuery'
+import FormTitle from '@/ui/FormTitle'
 
 type Character = {
   id: number
@@ -8,39 +9,42 @@ type Character = {
   character_name: string
   race: string
   class: string
+  avatar: string
 }
 
 export default function DMHomePage() {
   const { data, isLoading, error } = useSupabaseQuery<Character[]>({
     key: ['characters'],
     table: 'characters',
-    single: false, // возвращаем массив
+    single: false,
   })
 
   if (isLoading) return <p>Loading characters...</p>
   if (error) return <p className="text-red-500">Error: {error.message}</p>
 
-  // безопасно приводим к массиву объектов
   const characters: Character[] = Array.isArray(data) ? data.flat() : []
 
-  return (
-    <div className="space-y-4 bg-accent-hover">
-      {/* <h2 className="text-2xl font-bold">Welcome to Home Page 🎉</h2>
-      <p>This is the main dashboard after login.</p>
+  console.log(characters)
 
-      <h3 className="text-xl font-semibold">Characters:</h3>
+  return (
+    <div className="space-y-4 p-6 max-w-lg">
+      <FormTitle>Список игроков</FormTitle>
       {characters.length > 0 ? (
-        <ul className="space-y-2">
+        <ul className="space-y-2 ">
           {characters.map((char: Character) => (
-            <li key={char.id} className="p-2 border rounded">
-              <strong>{char.character_name}</strong> — {char.race} {char.class}
+            <li key={char.id} className="p-2 border border-alt rounded flex items-center gap-4">
+              <img src={char.avatar} alt="" className="w-15 h-15 rounded-full" />
+              <div>
+                <strong>{char.character_name}</strong> —{' '}
+                <span className="text-xs">{char.race}</span>,
+                <span className="text-xs">{char.class}</span>
+              </div>
             </li>
           ))}
         </ul>
       ) : (
         <p>No characters found.</p>
-      )} */}
-      Привет, эта страничка еще не готова
+      )}
     </div>
   )
 }

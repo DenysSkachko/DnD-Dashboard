@@ -3,6 +3,7 @@ import React from 'react'
 import { Shield, HeartPulse, Zap } from 'lucide-react'
 import ActionButton from '@/ui/ActionButtonFight'
 import { TemplateContext } from 'next/dist/shared/lib/app-router-context.shared-runtime'
+import { div } from 'framer-motion/client'
 
 interface Props {
   participant: any
@@ -12,7 +13,9 @@ interface Props {
 }
 
 export default function ParticipantItem({ participant, isDM, onEditEnemy, onDeleteEnemy }: Props) {
+
   const p = participant
+
   return (
     <div className="flex items-center gap-4">
       <div
@@ -23,11 +26,15 @@ export default function ParticipantItem({ participant, isDM, onEditEnemy, onDele
           hover:shadow-[0_0_35px_rgba(255,50,50,0.5)] 
           hover:border-red-500/50
           transition-all duration-300 ease-in-out 
-          items-center sm:max-w-lg flex-1 w-full mx-auto
+          items-center sm:max-w-lg flex-1 w-full mx-auto relative pl-16
           backdrop-blur-md animate-pulse-slow" 
       >
+
+        {p.avatar && <div className="absolute -left-3 top-1/2 -translate-y-1/2 drop-shadow-[0_0_8px_rgba(239,68,68,0.8)]"><img src={p.avatar} alt='' className="rounded-full w-15 h-15">
+          </img> </div>}
         {/* Имя и инициатива */}
-        <div className="flex w-full justify-between items-center">
+        <div className="flex w-full justify-between items-center ">
+          
           <span className="text-xl font-extrabold text-light tracking-widest uppercase drop-shadow-[0_0_6px_rgba(239,68,68,0.8)]">
             {p.name}
           </span>
