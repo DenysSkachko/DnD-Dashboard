@@ -23,8 +23,8 @@ export default function ParticipantItem({ participant, isDM, onEditEnemy, onDele
           hover:shadow-[0_0_35px_rgba(255,50,50,0.5)] 
           hover:border-red-500/50
           transition-all duration-300 ease-in-out 
-          items-center max-w-md flex-1
-          backdrop-blur-md animate-pulse-slow"
+          items-center sm:max-w-lg flex-1 w-full mx-auto
+          backdrop-blur-md animate-pulse-slow" 
       >
         {/* Имя и инициатива */}
         <div className="flex w-full justify-between items-center">

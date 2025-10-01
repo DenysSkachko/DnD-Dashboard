@@ -216,7 +216,7 @@ export default function CombatPage() {
               </div>
             )}
 
-            <ul className="flex flex-col gap-2 mx-auto w-fit">
+            <ul className="flex flex-col gap-2 mx-auto w-full">
               {participants.map(p => (
                 <li key={p.id}>
                   <ParticipantItem

@@ -29,7 +29,7 @@ export default function PlayerFooter({ myParticipant, onSave }: Props) {
         transition-all duration-300"
     >
       {/* Inputs + Save Button */}
-      <div className="flex flex-1 max-w-xl gap-4">
+      <div className="flex flex-1 max-w-xl gap-4 mx-auto">
         {/* HP Input */}
         <div
           className="flex-1 relative flex items-center
