@@ -15,19 +15,19 @@ interface Props {
 export default function ParticipantItem({ participant, isDM, onEditEnemy, onDeleteEnemy }: Props) {
 
   const p = participant
+  const isEnemy = p.is_enemy === true || p.is_enemy === 'true'
 
   return (
     <div className="flex items-center gap-4">
       <div
-        className="flex flex-col px-6 py-4 
-          bg-gradient-to-br from-red-950/90 via-black/80 to-stone-900/80
+        className={`flex flex-col px-6 py-4 
           rounded-2xl border border-red-600/30 
           shadow-[0_0_25px_rgba(255,0,0,0.3)] 
           hover:shadow-[0_0_35px_rgba(255,50,50,0.5)] 
           hover:border-red-500/50
           transition-all duration-300 ease-in-out 
           items-center sm:max-w-lg flex-1 w-full mx-auto relative pl-16
-          backdrop-blur-md animate-pulse-slow" 
+          backdrop-blur-md animate-pulse-slow ${isEnemy ? '' : 'bg-gradient-to-br from-red-950/90 via-black/80 to-stone-900/80'}`}
       >
 
         {p.avatar && <div className="absolute -left-3 top-1/2 -translate-y-1/2 drop-shadow-[0_0_8px_rgba(239,68,68,0.8)]"><img src={p.avatar} alt='' className="rounded-full w-15 h-15">
@@ -39,7 +39,7 @@ export default function ParticipantItem({ participant, isDM, onEditEnemy, onDele
             {p.name}
           </span>
           <div className="flex items-center gap-2 text-yellow-300 font-semibold">
-            <Zap className="w-5 h-5 animate-flicker" />
+            <Zap className="w-5 h-5" />
             <span className="text-lg">{p.initiative}</span>
           </div>
         </div>
@@ -71,15 +71,18 @@ export default function ParticipantItem({ participant, isDM, onEditEnemy, onDele
         ) : (
           ''
         )}
-      </div>
 
-      {/* Кнопки управления для ДМа */}
+          {/* Кнопки управления для ДМа */}
       {isDM && p.is_enemy && (
-        <div className="flex gap-2 mt-2">
+        <div className="flex flex-col gap-2 absolute -left-2 top-1/2 -translate-y-1/2">
           <ActionButton type="edit" onClick={onEditEnemy} />
           <ActionButton type="delete" onClick={onDeleteEnemy} />
         </div>
       )}
+         
+      </div>
+
+     
     </div>
   )
 }
