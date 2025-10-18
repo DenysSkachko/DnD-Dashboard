@@ -149,6 +149,7 @@ export const useAddEnemy = (fightId?: number) => {
   })
 }
 // ===== Вступление игрока / обновление инициативы =====
+// ===== Вступление игрока / обновление инициативы =====
 export const useJoinFight = (fightId?: number) => {
   const queryClient = useQueryClient()
   const { account } = useAccount()
@@ -159,7 +160,7 @@ export const useJoinFight = (fightId?: number) => {
 
       const { data: character } = await supabase
         .from('characters')
-        .select('id, character_name')
+        .select('id, character_name, avatar')
         .eq('account_id', account.id)
         .single()
 
@@ -174,7 +175,7 @@ export const useJoinFight = (fightId?: number) => {
         .maybeSingle()
 
       if (existing) {
-        // ⚡ фикс: обновляем ТОЛЬКО инициативу
+        // ⚡ обновляем инициативу
         await supabase.from('fight_participants').update({ initiative }).eq('id', existing.id)
       } else {
         // Если игрок впервые заходит — создаем с полным набором данных
@@ -196,6 +197,7 @@ export const useJoinFight = (fightId?: number) => {
             max_hp: combat.max_hp,
             armor_class: combat.armor_class,
             initiative,
+            avatar: character.avatar, // 👈 добавили аватар
           },
         ])
       }
@@ -205,6 +207,7 @@ export const useJoinFight = (fightId?: number) => {
     },
   })
 }
+
 // ===== Изменение своих HP (игрок) =====
 // ===== Изменение своих HP и Temp HP (игрок) =====
 export const useUpdateHP = (fightId?: number) => {
